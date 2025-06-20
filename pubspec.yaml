@@ -1,0 +1,154 @@
+# Dosya Konumu: linkci/pubspec.yaml
+
+name: linkcim
+description: Akilli Video Kayit ve Kategorilendirme Uygulamasi - Instagram videolarinizi organize edin ve kolayca bulun!
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Veritabani - Hive
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.2
+
+  # HTTP istekleri ve API
+  http: ^1.2.1
+  dio: ^5.4.3+1
+
+  # Link acma ve URL yonetimi
+  url_launcher: ^6.2.5
+
+  # Tarih ve zaman formatlama
+  intl: ^0.19.0
+
+  # UI iconlari ve tasarim
+  cupertino_icons: ^1.0.6
+
+  # Video ve Web ozellikleri
+  webview_flutter: ^4.7.0
+  flutter_inappwebview: ^6.0.0
+
+  # Paylaşma ve clipboard
+  share_plus: ^9.0.0
+
+  # Gorsel onbellekleme ve resim yonetimi
+  cached_network_image: ^3.3.1
+
+  # JSON serialization
+  json_annotation: ^4.9.0
+
+  # Dosya yonetimi ve storage
+  shared_preferences: ^2.2.3
+
+  # State yonetimi
+  provider: ^6.1.2
+
+  # Permission handling
+  permission_handler: ^12.0.0+1
+
+  # Connectivity checking
+  connectivity_plus: ^6.0.3
+
+  # Device info
+  device_info_plus: ^10.1.0
+
+  # Package info
+  package_info_plus: ^8.0.0
+
+  # UUID generator
+  uuid: ^4.4.0
+
+  # Video ve Audio işleme - Güncel ve uyumlu paketler
+  video_player: ^2.8.6
+  chewie: ^1.8.1
+  
+  # Dosya seçme ve işleme
+  file_picker: ^8.0.0+1
+  image_picker: ^1.1.2
+  
+  # Video thumbnail oluşturma
+  video_thumbnail: ^0.5.3
+  
+  # Audio kayıt ve çalma
+  record: ^5.1.0
+  just_audio: ^0.9.39
+  
+  # Audio waveforms (opsiyonel)
+  audio_waveforms: ^1.0.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Code generation - Hive için
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.13
+
+  # Linting and analysis
+  flutter_lints: ^4.0.0
+
+  # Testing utilities
+  mockito: ^5.4.4
+
+  # Integration testing
+  integration_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  # App assets
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
+    - assets/data/
+
+  # Custom fonts (opsiyonel)
+  # fonts:
+  #   - family: CustomFont
+  #     fonts:
+  #       - asset: assets/fonts/CustomFont-Regular.ttf
+  #       - asset: assets/fonts/CustomFont-Bold.ttf
+  #         weight: 700
+
+# Analyzer ayarlari
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+
+# Linter kurallari
+linter:
+  rules:
+    # Dart style guide
+    - always_declare_return_types
+    - always_put_control_body_on_new_line
+    - always_put_required_named_parameters_first
+    - avoid_empty_else
+    - avoid_print
+    - avoid_returning_null_for_void
+    - avoid_unused_constructor_parameters
+    - cancel_subscriptions
+    - close_sinks
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_const_literals_to_create_immutables
+    - prefer_final_fields
+    - prefer_final_in_for_each
+    - prefer_final_locals
+    - sort_constructors_first
+    - sort_unnamed_constructors_first
+    - use_key_in_widget_constructors
+
+
