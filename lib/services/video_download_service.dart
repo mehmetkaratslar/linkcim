@@ -779,6 +779,9 @@ class VideoDownloadService {
           _debugPrint(
               '✅ Gerçek video indirme başarılı: $finalPath (${fileSize} bytes)');
 
+          // İndirme geçmişine kaydet
+          await _saveDownloadHistory(finalPath, fileSize);
+
           return {
             'success': true,
             'file_path': finalPath,
@@ -913,17 +916,44 @@ class VideoDownloadService {
     }
   }
 
+  // 💾 İndirme geçmişine kaydet
+  static Future<void> _saveDownloadHistory(
+      String filePath, int fileSize) async {
+    try {
+      final downloadDir = await getDownloadDirectory();
+      final historyFile = File('${downloadDir.path}/.download_history.txt');
+
+      final fileName = filePath.split('/').last;
+      final downloadTime = DateTime.now().toIso8601String();
+
+      final historyEntry = '$fileName|$filePath|$fileSize|$downloadTime\n';
+
+      // Geçmişe ekle
+      await historyFile.writeAsString(historyEntry, mode: FileMode.append);
+
+      _debugPrint('📝 İndirme geçmişine kaydedildi: $fileName');
+    } catch (e) {
+      _debugPrint('❌ İndirme geçmişi kayıt hatası: $e');
+    }
+  }
+
   // 📊 İndirme geçmişi
   static Future<List<Map<String, dynamic>>> getDownloadHistory() async {
     try {
+      _debugPrint('📊 İndirme geçmişi yükleniyor...');
       final downloadDir = await getDownloadDirectory();
+      _debugPrint('📁 İndirme dizini: ${downloadDir.path}');
+
       final files = downloadDir.listSync();
+      _debugPrint('📁 Bulunan dosya sayısı: ${files.length}');
 
       List<Map<String, dynamic>> history = [];
 
       for (final file in files) {
         if (file is File && !file.path.endsWith('.txt')) {
           final stat = await file.stat();
+          _debugPrint(
+              '📄 Dosya bulundu: ${file.path.split('/').last} (${stat.size} bytes)');
           history.add({
             'file_name': file.path.split('/').last,
             'file_path': file.path,
@@ -936,9 +966,10 @@ class VideoDownloadService {
       history.sort((a, b) => (b['download_date'] as DateTime)
           .compareTo(a['download_date'] as DateTime));
 
+      _debugPrint('📊 İndirme geçmişi hazır: ${history.length} video');
       return history;
     } catch (e) {
-      _debugPrint('İndirme geçmişi hatası: $e');
+      _debugPrint('❌ İndirme geçmişi hatası: $e');
       return [];
     }
   }

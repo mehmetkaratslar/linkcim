@@ -319,13 +319,13 @@ JSON formatında yanıt ver:
 
 Bu video hakkında objektif bilgi ver. Yorum yapma, övme veya eleştiri yapma.
 
-1. Video ne hakkında (kısa ve net)
+1. Video ne hakkında (maksimum 5 kelime ile kısa ve net)
 2. Kategori: Yazılım, Eğitim, Eğlence, Spor, Yemek, Müzik, Sanat, Bilim, Teknoloji, Genel
 3. 3-5 alakalı etiket
 
 JSON formatında yanıt ver:
 {
-  "description": "Video ne hakkında (sadece konu, yorum yok)",
+  "description": "Video ne hakkında (maksimum 5 kelime, yorum yok)",
   "category": "kategori", 
   "tags": ["etiket1", "etiket2", "etiket3"]
 }''';
@@ -371,8 +371,8 @@ JSON formatında yanıt ver:
 
               final analysisResult = {
                 'success': true,
-                'description': _cleanText(result['description']?.toString() ??
-                    'Gelişmiş AI analizi ile açıklama üretildi'),
+                'description': _limitDescription(_cleanText(
+                    result['description']?.toString() ?? 'AI Video Analizi')),
                 'category': _validateCategory(
                     result['category']?.toString() ?? 'Genel'),
                 'tags': _processTags(result['tags']),
@@ -495,6 +495,15 @@ JSON formatında yanıt ver:
         .replaceAll(RegExp(r'\s+'), ' ') // Fazla boşlukları kaldır
         .replaceAll('"', '') // Tırnak işaretlerini kaldır
         .trim();
+  }
+
+  // Başlığı 5 kelime ile sınırla
+  static String _limitDescription(String description) {
+    final words = description.split(' ');
+    if (words.length <= 5) {
+      return description;
+    }
+    return words.take(5).join(' ');
   }
 
   // Kategori doğrulama
@@ -701,7 +710,7 @@ JSON formatında yanıt ver:
 
     return {
       'success': true,
-      'description': description,
+      'description': _limitDescription(description),
       'category': category,
       'tags': tags,
       'source': 'simple'

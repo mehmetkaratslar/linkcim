@@ -1,7 +1,7 @@
-# Dosya Konumu: linkci/pubspec.yaml
+# Dosya Konumu: pubspec.yaml
 
 name: linkcim
-description: Akilli Video Kayit ve Kategorilendirme Uygulamasi - Instagram videolarinizi organize edin ve kolayca bulun!
+description: Süper Güçlü Video İndirme ve Akıllı AI Analiz Uygulaması - Her türlü videoyu indir, kategorize et ve organize et!
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -13,48 +13,46 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Veritabani - Hive
+  # Veritabanı - Hive
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.2
 
-  # HTTP istekleri ve API
+  # HTTP istekleri ve API - Gelişmiş
   http: ^1.2.1
   dio: ^5.4.3+1
+  connectivity_plus: ^6.0.3
 
-  # Link acma ve URL yonetimi
+  # Link açma ve URL yönetimi
   url_launcher: ^6.2.5
 
   # Tarih ve zaman formatlama
   intl: ^0.19.0
 
-  # UI iconlari ve tasarim
+  # UI ikonları ve tasarım
   cupertino_icons: ^1.0.6
 
-  # Video ve Web ozellikleri
+  # Video ve Web özellikleri
   webview_flutter: ^4.7.0
   flutter_inappwebview: ^6.0.0
 
   # Paylaşma ve clipboard
   share_plus: ^9.0.0
 
-  # Gorsel onbellekleme ve resim yonetimi
+  # Görsel önbellekleme ve resim yönetimi
   cached_network_image: ^3.3.1
 
   # JSON serialization
   json_annotation: ^4.9.0
 
-  # Dosya yonetimi ve storage
+  # Dosya yönetimi ve storage
   shared_preferences: ^2.2.3
 
-  # State yonetimi
+  # State yönetimi
   provider: ^6.1.2
 
-  # Permission handling
+  # Permission handling - Gelişmiş
   permission_handler: ^12.0.0+1
-
-  # Connectivity checking
-  connectivity_plus: ^6.0.3
 
   # Device info
   device_info_plus: ^10.1.0
@@ -69,19 +67,23 @@ dependencies:
   video_player: ^2.8.6
   chewie: ^1.8.1
   
-  # Dosya seçme ve işleme
+  # Dosya seçme ve işleme - Gelişmiş
   file_picker: ^8.0.0+1
   image_picker: ^1.1.2
   
-  # Video thumbnail oluşturma
+  # Video thumbnail oluşturma - Güçlendirilmiş
   video_thumbnail: ^0.5.3
   
-  # Audio kayıt ve çalma
+  # Audio kayıt ve çalma - İsteğe bağlı
   record: ^5.1.0
   just_audio: ^0.9.39
   
-  # Audio waveforms (opsiyonel)
+  # Audio waveforms - İsteğe bağlı
   audio_waveforms: ^1.0.5
+
+  # Network ve download optimizasyonu (opsiyonel)
+  # dio_cache_interceptor: ^3.5.0
+  # dio_certificate_pinning: ^4.1.0
 
 dev_dependencies:
   flutter_test:
@@ -111,15 +113,17 @@ flutter:
     - assets/animations/
     - assets/data/
 
-  # Custom fonts (opsiyonel)
+  # Custom fonts - Premium görünüm için (şimdilik devre dışı)
   # fonts:
-  #   - family: CustomFont
+  #   - family: Roboto
   #     fonts:
-  #       - asset: assets/fonts/CustomFont-Regular.ttf
-  #       - asset: assets/fonts/CustomFont-Bold.ttf
+  #       - asset: assets/fonts/Roboto-Regular.ttf
+  #       - asset: assets/fonts/Roboto-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Roboto-Bold.ttf
   #         weight: 700
 
-# Analyzer ayarlari
+# Analyzer ayarları - Gelişmiş
 analyzer:
   exclude:
     - "**/*.g.dart"
@@ -127,8 +131,12 @@ analyzer:
   strong-mode:
     implicit-casts: false
     implicit-dynamic: false
+  errors:
+    invalid_assignment: warning
+    missing_return: error
+    dead_code: info
 
-# Linter kurallari
+# Linter kuralları - Production ready
 linter:
   rules:
     # Dart style guide
@@ -150,5 +158,21 @@ linter:
     - sort_constructors_first
     - sort_unnamed_constructors_first
     - use_key_in_widget_constructors
+    
+    # Performance
+    - avoid_unnecessary_containers
+    - prefer_collection_literals
+    - prefer_spread_collections
+    - unnecessary_lambdas
+    - unnecessary_new
+    - unnecessary_null_in_if_null_operators
+    
+    # Safety
+    - avoid_relative_lib_imports
+    - avoid_types_as_parameter_names
+    - empty_catches
+    - hash_and_equals
+    - no_duplicate_case_values
+    - valid_regexps
 
 

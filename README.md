@@ -106,19 +106,6 @@ lib/
 - `.gitignore` dosyası hassas bilgileri korur
 - Tüm API çağrıları HTTPS üzerinden yapılır
 
-## 📄 Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
-
-## 👨‍💻 Geliştirici
-
-**Mehmet Karatslar** - [@mehmetkaratslar](https://github.com/mehmetkaratslar)
-
-## 🙏 Teşekkürler
-
-- OpenAI API desteği için OpenAI'ya
-- Flutter ekibine harika framework için
-- Açık kaynak topluluğuna
 
 ---
 

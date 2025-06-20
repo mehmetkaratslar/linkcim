@@ -27,12 +27,15 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
     setState(() => isLoading = true);
 
     try {
+      print('🎬 İndirme geçmişi yükleniyor...');
       final history = await VideoDownloadService.getDownloadHistory();
+      print('🎬 İndirme geçmişi yüklendi: ${history.length} dosya');
       setState(() {
         downloadHistory = history;
         isLoading = false;
       });
     } catch (e) {
+      print('🎬 İndirme geçmişi yükleme hatası: $e');
       setState(() => isLoading = false);
       _showError('İndirme geçmişi yüklenemedi: $e');
     }

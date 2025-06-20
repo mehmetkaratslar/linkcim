@@ -1,6 +1,9 @@
 // Dosya Konumu: lib/utils/constants.dart
 
 class AppConstants {
+  // Debug modu
+  static const bool debugMode = true;
+
   // Renkler
   static const primaryColor = 0xFF2196F3;
   static const secondaryColor = 0xFF1976D2;
