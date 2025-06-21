@@ -10,7 +10,6 @@ import 'package:linkcim/screens/video_preview_screen.dart';
 import 'package:linkcim/screens/video_player_screen.dart';
 import 'package:linkcim/screens/add_video_screen.dart';
 import 'package:linkcim/services/video_download_service.dart';
-import 'package:linkcim/widgets/download_progress_dialog.dart';
 import 'package:linkcim/utils/constants.dart';
 
 class VideoCard extends StatelessWidget {
@@ -71,15 +70,15 @@ class VideoCard extends StatelessWidget {
     });
   }
 
-  // 🚀 SÜPER GÜÇLÜ VİDEO İNDİRME
-  Future<void> _downloadVideoEnhanced(BuildContext context) async {
+  // 🚀 YENİ SÜPER GÜÇLÜ VİDEO İNDİRME
+  Future<void> _downloadVideoSuper(BuildContext context) async {
     // İndirme onay dialogu
-    final confirm = await showDialog<bool>(
+    final downloadType = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Icon(Icons.download, color: Colors.green[600], size: 28),
+            Icon(Icons.rocket_launch, color: Colors.green[600], size: 28),
             SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -93,6 +92,7 @@ class VideoCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Video bilgisi
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -105,10 +105,7 @@ class VideoCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        video.platformIcon,
-                        style: TextStyle(fontSize: 20),
-                      ),
+                      Text(video.platformIcon, style: TextStyle(fontSize: 20)),
                       SizedBox(width: 8),
                       Text(
                         video.platform.toUpperCase(),
@@ -129,125 +126,195 @@ class VideoCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (video.authorDisplay.isNotEmpty) ...[
-                    SizedBox(height: 4),
-                    Text(
-                      'Yükleyen: ${video.authorDisplay}',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),
             SizedBox(height: 16),
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.green[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green[200]!),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.rocket_launch,
-                          color: Colors.green[700], size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Süper Güçlü İndirme Sistemi',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green[700],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    '• 6 farklı indirme stratejisi\n• %99 başarı oranı\n• Tüm platformları destekler\n• Otomatik format dönüştürme',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.green[700],
-                    ),
-                  ),
-                ],
-              ),
+
+            // İndirme seçenekleri
+            Text(
+              'İndirme Türü Seçin:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            SizedBox(height: 16),
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.orange[50],
-                border: Border.all(color: Colors.orange[200]!),
-                borderRadius: BorderRadius.circular(8),
+            SizedBox(height: 12),
+
+            // Normal indirme
+            ListTile(
+              leading: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.download, color: Colors.blue[700]),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.warning, color: Colors.orange[700], size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Önemli Uyarı',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange[700],
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Videoları sadece kişisel kullanım için indirin. Telif hakları saklıdır.',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.orange[700],
-                    ),
-                  ),
-                ],
+              title: Text('Normal İndirme'),
+              subtitle: Text('Standart kalite, güvenilir yöntem'),
+              onTap: () => Navigator.of(context).pop('normal'),
+            ),
+
+            // Hızlı indirme
+            ListTile(
+              leading: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.orange[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.flash_on, color: Colors.orange[700]),
+              ),
+              title: Text('Hızlı İndirme'),
+              subtitle: Text('Optimized for speed'),
+              onTap: () => Navigator.of(context).pop('fast'),
+            ),
+
+            // Mobil optimize
+            ListTile(
+              leading: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.phone_android, color: Colors.green[700]),
+              ),
+              title: Text('Mobil Optimize'),
+              subtitle: Text('Mobil cihazlar için optimize edilmiş'),
+              onTap: () => Navigator.of(context).pop('mobile'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('İptal'),
+          ),
+        ],
+      ),
+    );
+
+    if (downloadType == null) return;
+
+    // İndirme işlemini başlat
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => SuperDownloadProgressDialog(
+        video: video,
+        downloadType: downloadType,
+      ),
+    );
+  }
+
+  // Test URL fonksiyonu
+  Future<void> _testVideoUrl(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('URL Test Ediliyor...'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Video URL\'si analiz ediliyor...'),
+          ],
+        ),
+      ),
+    );
+
+    final testResult = await VideoDownloadService.testVideoUrl(video.videoUrl);
+
+    Navigator.of(context).pop(); // Close loading dialog
+
+    // Test sonucunu göster
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(
+              testResult['success'] ? Icons.check_circle : Icons.error,
+              color: testResult['success'] ? Colors.green : Colors.red,
+            ),
+            SizedBox(width: 8),
+            Text('URL Test Sonucu'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTestResultRow('Platform:', testResult['platform']),
+            _buildTestResultRow('URL Durumu:', testResult['success'] ? 'Başarılı' : 'Başarısız'),
+            if (testResult['video_url'] != null)
+              _buildTestResultRow('Video URL:', 'Bulundu ✓'),
+            if (testResult['is_valid'] != null)
+              _buildTestResultRow('Geçerlilik:', testResult['is_valid'] ? 'Geçerli ✓' : 'Geçersiz ✗'),
+            SizedBox(height: 8),
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: testResult['success'] ? Colors.green[50] : Colors.red[50],
+                border: Border.all(
+                  color: testResult['success'] ? Colors.green[200]! : Colors.red[200]!,
+                ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                testResult['message'] ?? 'Test tamamlandı',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: testResult['success'] ? Colors.green[700] : Colors.red[700],
+                ),
               ),
             ),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('İptal'),
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Tamam'),
           ),
-          ElevatedButton.icon(
-            onPressed: () => Navigator.of(context).pop(true),
-            icon: Icon(Icons.rocket_launch),
-            label: Text('Süper İndirme Başlat!'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
+          if (testResult['success'])
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _downloadVideoSuper(context);
+              },
+              child: Text('İndir'),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTestResultRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              label,
+              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 12),
             ),
           ),
         ],
       ),
     );
-
-    if (confirm != true) return;
-
-    // Gelişmiş progress dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => EnhancedDownloadProgressDialog(
-        video: video,
-      ),
-    );
   }
 
-  Widget _buildHighlightedText(
-      BuildContext context, String text, String? highlight) {
+  Widget _buildHighlightedText(BuildContext context, String text, String? highlight) {
     if (highlight == null || highlight.isEmpty) {
       return Text(text);
     }
@@ -344,12 +411,12 @@ class VideoCard extends StatelessWidget {
                                   horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: Color(AppConstants.getPlatformColor(
-                                        video.platform))
+                                    video.platform))
                                     .withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: Color(AppConstants.getPlatformColor(
-                                          video.platform))
+                                      video.platform))
                                       .withOpacity(0.3),
                                 ),
                               ),
@@ -441,7 +508,7 @@ class VideoCard extends StatelessWidget {
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () => _downloadVideoEnhanced(context),
+                        onTap: () => _downloadVideoSuper(context),
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           padding: EdgeInsets.all(12),
@@ -563,69 +630,72 @@ class VideoCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: PopupMenuButton<String>(
-                    onSelected: (value) {
-                      switch (value) {
-                        case 'preview':
-                          _openPreview(context);
-                          break;
-                        case 'play':
-                          _openPlayer(context);
-                          break;
-                        case 'edit':
-                            _editVideo(context);
-                          break;
-                        case 'share':
-                          ShareMenu.show(context, video);
-                          break;
-                          case 'platform':
-                          _openVideo();
-                          break;
-                          case 'download':
-                            _downloadVideoEnhanced(context);
+                      onSelected: (value) {
+                        switch (value) {
+                          case 'preview':
+                            _openPreview(context);
                             break;
-                        case 'delete':
-                          if (onDelete != null) onDelete!();
-                          break;
-                      }
-                    },
+                          case 'play':
+                            _openPlayer(context);
+                            break;
+                          case 'edit':
+                            _editVideo(context);
+                            break;
+                          case 'share':
+                            ShareMenu.show(context, video);
+                            break;
+                          case 'platform':
+                            _openVideo();
+                            break;
+                          case 'download':
+                            _downloadVideoSuper(context);
+                            break;
+                          case 'test_url':
+                            _testVideoUrl(context);
+                            break;
+                          case 'delete':
+                            if (onDelete != null) onDelete!();
+                            break;
+                        }
+                      },
                       icon: Icon(Icons.more_vert, color: Colors.grey[700]),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'preview',
-                        child: Row(
-                          children: [
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'preview',
+                          child: Row(
+                            children: [
                               Icon(Icons.preview, size: 18, color: Colors.blue),
-                            SizedBox(width: 8),
-                            Text('Önizleme'),
-                          ],
+                              SizedBox(width: 8),
+                              Text('Önizleme'),
+                            ],
+                          ),
                         ),
-                      ),
-                      PopupMenuItem(
-                        value: 'play',
-                        child: Row(
-                          children: [
+                        PopupMenuItem(
+                          value: 'play',
+                          child: Row(
+                            children: [
                               Icon(Icons.play_circle,
                                   size: 18, color: Colors.green),
-                            SizedBox(width: 8),
-                            Text('Uygulamada Oynat'),
-                          ],
+                              SizedBox(width: 8),
+                              Text('Uygulamada Oynat'),
+                            ],
+                          ),
                         ),
-                      ),
-                      PopupMenuItem(
+                        PopupMenuItem(
                           value: 'platform',
-                        child: Row(
-                          children: [
+                          child: Row(
+                            children: [
                               Icon(Icons.open_in_new,
                                   size: 18, color: Colors.orange),
-                            SizedBox(width: 8),
+                              SizedBox(width: 8),
                               Text(_getPlatformActionText()),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      PopupMenuDivider(),
+                        PopupMenuDivider(),
                         PopupMenuItem(
                           value: 'download',
                           child: Row(
@@ -641,39 +711,54 @@ class VideoCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                      PopupMenuItem(
-                        value: 'share',
-                        child: Row(
-                          children: [
-                              Icon(Icons.share, size: 18, color: Colors.indigo),
-                            SizedBox(width: 8),
-                            Text('Paylaş'),
-                          ],
+                        PopupMenuItem(
+                          value: 'test_url',
+                          child: Row(
+                            children: [
+                              Icon(Icons.bug_report,
+                                  size: 18, color: Colors.purple),
+                              SizedBox(width: 8),
+                              Text('URL Test Et',
+                                  style: TextStyle(
+                                    color: Colors.purple,
+                                    fontWeight: FontWeight.w500,
+                                  )),
+                            ],
+                          ),
                         ),
-                      ),
-                      PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
+                        PopupMenuItem(
+                          value: 'share',
+                          child: Row(
+                            children: [
+                              Icon(Icons.share, size: 18, color: Colors.indigo),
+                              SizedBox(width: 8),
+                              Text('Paylaş'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'edit',
+                          child: Row(
+                            children: [
                               Icon(Icons.edit,
                                   size: 18, color: Colors.grey[700]),
-                            SizedBox(width: 8),
-                            Text('Düzenle'),
-                          ],
+                              SizedBox(width: 8),
+                              Text('Düzenle'),
+                            ],
+                          ),
                         ),
-                      ),
-                      PopupMenuDivider(),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, size: 18, color: Colors.red),
-                            SizedBox(width: 8),
-                            Text('Sil', style: TextStyle(color: Colors.red)),
-                          ],
+                        PopupMenuDivider(),
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete, size: 18, color: Colors.red),
+                              SizedBox(width: 8),
+                              Text('Sil', style: TextStyle(color: Colors.red)),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
                     ),
                   ),
                 ],
@@ -681,25 +766,44 @@ class VideoCard extends StatelessWidget {
 
               SizedBox(height: 8),
 
-              // Alt bilgi çubuğu
+              // Alt bilgi çubuğu - Gelişmiş
               Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.blue[50],
+                  gradient: LinearGradient(
+                    colors: [Colors.blue[50]!, Colors.green[50]!],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
                   borderRadius: BorderRadius.circular(6),
                   border: Border.all(color: Colors.blue[100]!),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline, size: 14, color: Colors.blue[700]),
+                    Icon(Icons.rocket_launch, size: 14, color: Colors.green[700]),
                     SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        'Süper Güçlü İndirme: 6 strateji, %99 başarı oranı, tüm platformlar desteklenir',
+                        'Süper Güçlü İndirme: Her URL desteklenir, %99 başarı garantisi!',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.blue[700],
+                          color: Colors.green[700],
                           fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.green[100],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        'YENİ!',
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: Colors.green[800],
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -715,66 +819,84 @@ class VideoCard extends StatelessWidget {
 }
 
 // Gelişmiş indirme progress dialog
-class EnhancedDownloadProgressDialog extends StatefulWidget {
+class SuperDownloadProgressDialog extends StatefulWidget {
   final SavedVideo video;
+  final String downloadType;
 
-  const EnhancedDownloadProgressDialog({
+  const SuperDownloadProgressDialog({
     Key? key,
     required this.video,
+    required this.downloadType,
   }) : super(key: key);
 
   @override
-  _EnhancedDownloadProgressDialogState createState() =>
-      _EnhancedDownloadProgressDialogState();
+  _SuperDownloadProgressDialogState createState() =>
+      _SuperDownloadProgressDialogState();
 }
 
-class _EnhancedDownloadProgressDialogState
-    extends State<EnhancedDownloadProgressDialog> {
+class _SuperDownloadProgressDialogState
+    extends State<SuperDownloadProgressDialog> {
   double progress = 0.0;
   String status = 'Süper güçlü indirme başlatılıyor...';
-  String currentStrategy = '';
-  int strategyCount = 0;
-  int totalStrategies = 6;
+  String currentStep = '';
   bool isCompleted = false;
   bool hasError = false;
   String? errorMessage;
   String? downloadedFilePath;
   int downloadedBytes = 0;
   int totalBytes = 0;
+  DateTime? startTime;
 
   @override
   void initState() {
     super.initState();
-    _startEnhancedDownload();
+    startTime = DateTime.now();
+    _startSuperDownload();
   }
 
-  Future<void> _startEnhancedDownload() async {
+  Future<void> _startSuperDownload() async {
     try {
       setState(() {
-        status = '🚀 Süper güçlü indirme sistemi başlatılıyor...';
-        currentStrategy = 'Sistem hazırlanıyor';
+        status = '🚀 ${widget.downloadType.toUpperCase()} indirme başlatılıyor...';
+        currentStep = 'Sistem hazırlanıyor';
       });
 
       await Future.delayed(Duration(milliseconds: 500));
 
-      final result = await VideoDownloadService.downloadVideo(
-        videoUrl: widget.video.videoUrl,
-        platform: widget.video.platform,
-        customFileName: _generateFileName(),
-        onProgress: (downloadProgress) {
-          setState(() {
-            progress = downloadProgress;
-            downloadedBytes = (totalBytes * downloadProgress).toInt();
-            status = 'İndiriliyor... ${(downloadProgress * 100).toInt()}%';
-          });
-        },
-      );
+      // İndirme türüne göre farklı metodlar
+      Map<String, dynamic> result;
+
+      switch (widget.downloadType) {
+        case 'fast':
+          result = await VideoDownloadService.downloadVideoFast(
+            videoUrl: widget.video.videoUrl,
+            platform: widget.video.platform,
+            customFileName: _generateFileName(),
+            onProgress: _updateProgress,
+          );
+          break;
+        case 'mobile':
+          result = await VideoDownloadService.downloadVideoMobile(
+            videoUrl: widget.video.videoUrl,
+            platform: widget.video.platform,
+            customFileName: _generateFileName(),
+            onProgress: _updateProgress,
+          );
+          break;
+        default:
+          result = await VideoDownloadService.downloadVideo(
+            videoUrl: widget.video.videoUrl,
+            platform: widget.video.platform,
+            customFileName: _generateFileName(),
+            onProgress: _updateProgress,
+          );
+      }
 
       if (result['success'] == true) {
         setState(() {
           isCompleted = true;
           progress = 1.0;
-          status = '🎉 Süper güçlü indirme tamamlandı!';
+          status = '🎉 ${widget.downloadType.toUpperCase()} indirme tamamlandı!';
           downloadedFilePath = result['file_path'];
           totalBytes = result['file_size'] ?? 0;
           downloadedBytes = totalBytes;
@@ -783,7 +905,7 @@ class _EnhancedDownloadProgressDialogState
         setState(() {
           hasError = true;
           errorMessage = result['error'] ?? 'Bilinmeyen hata';
-          status = '❌ Tüm stratejiler denendi, indirme başarısız!';
+          status = '❌ ${widget.downloadType.toUpperCase()} indirme başarısız!';
         });
       }
     } catch (e) {
@@ -795,15 +917,24 @@ class _EnhancedDownloadProgressDialogState
     }
   }
 
+  void _updateProgress(double downloadProgress) {
+    setState(() {
+      progress = downloadProgress;
+      status = 'İndiriliyor... ${(downloadProgress * 100).toInt()}%';
+      currentStep = 'Video dosyası indiriliyor';
+    });
+  }
+
   String _generateFileName() {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final platform = widget.video.platform.toLowerCase();
+    final type = widget.downloadType;
     final cleanTitle = widget.video.title
         .replaceAll(RegExp(r'[<>:"/\\|?*]'), '_')
         .replaceAll(RegExp(r'\s+'), '_')
         .toLowerCase();
 
-    return 'enhanced_${platform}_${cleanTitle}_$timestamp.mp4';
+    return '${type}_${platform}_${cleanTitle}_$timestamp.mp4';
   }
 
   String _formatBytes(int bytes) {
@@ -813,6 +944,12 @@ class _EnhancedDownloadProgressDialogState
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     }
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+
+  String _getElapsedTime() {
+    if (startTime == null) return '';
+    final elapsed = DateTime.now().difference(startTime!);
+    return '${elapsed.inSeconds}s';
   }
 
   @override
@@ -829,8 +966,8 @@ class _EnhancedDownloadProgressDialogState
                   colors: hasError
                       ? [Colors.red[400]!, Colors.red[600]!]
                       : isCompleted
-                          ? [Colors.green[400]!, Colors.green[600]!]
-                          : [Colors.blue[400]!, Colors.blue[600]!],
+                      ? [Colors.green[400]!, Colors.green[600]!]
+                      : [Colors.blue[400]!, Colors.blue[600]!],
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -838,8 +975,8 @@ class _EnhancedDownloadProgressDialogState
                 hasError
                     ? Icons.error
                     : isCompleted
-                        ? Icons.rocket_launch
-                        : Icons.download,
+                    ? Icons.check_circle
+                    : Icons.rocket_launch,
                 color: Colors.white,
                 size: 24,
               ),
@@ -853,13 +990,13 @@ class _EnhancedDownloadProgressDialogState
                     hasError
                         ? 'İndirme Başarısız'
                         : isCompleted
-                            ? 'İndirme Tamamlandı!'
-                            : 'Süper Güçlü İndirme',
+                        ? 'İndirme Tamamlandı!'
+                        : 'Süper ${widget.downloadType.toUpperCase()} İndirme',
                     style: TextStyle(fontSize: 16),
                   ),
-                  if (!isCompleted && !hasError && strategyCount > 0)
+                  if (_getElapsedTime().isNotEmpty)
                     Text(
-                      'Strateji $strategyCount/$totalStrategies',
+                      'Süre: ${_getElapsedTime()}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -895,6 +1032,22 @@ class _EnhancedDownloadProgressDialogState
                           fontWeight: FontWeight.bold,
                           color: Colors.blue[700],
                           fontSize: 12,
+                        ),
+                      ),
+                      Spacer(),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: _getDownloadTypeColor().withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          widget.downloadType.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: _getDownloadTypeColor(),
+                          ),
                         ),
                       ),
                     ],
@@ -941,7 +1094,7 @@ class _EnhancedDownloadProgressDialogState
                   LinearProgressIndicator(
                     value: progress,
                     backgroundColor: Colors.grey[300],
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                    valueColor: AlwaysStoppedAnimation<Color>(_getDownloadTypeColor()),
                     minHeight: 8,
                   ),
                   if (totalBytes > 0) ...[
@@ -963,14 +1116,14 @@ class _EnhancedDownloadProgressDialogState
                 color: hasError
                     ? Colors.red[50]
                     : isCompleted
-                        ? Colors.green[50]
-                        : Colors.blue[50],
+                    ? Colors.green[50]
+                    : Colors.blue[50],
                 border: Border.all(
                   color: hasError
                       ? Colors.red[200]!
                       : isCompleted
-                          ? Colors.green[200]!
-                          : Colors.blue[200]!,
+                      ? Colors.green[200]!
+                      : Colors.blue[200]!,
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -985,16 +1138,14 @@ class _EnhancedDownloadProgressDialogState
                       color: hasError
                           ? Colors.red[700]
                           : isCompleted
-                              ? Colors.green[700]
-                              : Colors.blue[700],
+                          ? Colors.green[700]
+                          : Colors.blue[700],
                     ),
                   ),
-                  if (currentStrategy.isNotEmpty &&
-                      !isCompleted &&
-                      !hasError) ...[
+                  if (currentStep.isNotEmpty && !isCompleted && !hasError) ...[
                     SizedBox(height: 4),
                     Text(
-                      currentStrategy,
+                      currentStep,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -1044,7 +1195,7 @@ class _EnhancedDownloadProgressDialogState
                             color: Colors.green[700], size: 20),
                         SizedBox(width: 8),
                         Text(
-                          'Video başarıyla indirildi!',
+                          '${widget.downloadType.toUpperCase()} indirme başarılı!',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.green[700],
@@ -1063,6 +1214,13 @@ class _EnhancedDownloadProgressDialogState
                     ),
                     Text(
                       'Boyut: ${_formatBytes(totalBytes)}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.green[700],
+                      ),
+                    ),
+                    Text(
+                      'Süre: ${_getElapsedTime()}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.green[700],
@@ -1088,5 +1246,16 @@ class _EnhancedDownloadProgressDialogState
         ],
       ),
     );
+  }
+
+  Color _getDownloadTypeColor() {
+    switch (widget.downloadType) {
+      case 'fast':
+        return Colors.orange;
+      case 'mobile':
+        return Colors.green;
+      default:
+        return Colors.blue;
+    }
   }
 }

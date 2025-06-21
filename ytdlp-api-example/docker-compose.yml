@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  ytdlp-api:
+    build: .
+    ports:
+      - "0.0.0.0:8000:8000"
+    environment:
+      - API_KEY=45541d717524a99df5f994bb9f6cbce825269852be079594b8e35f7752d6f1bd
+    volumes:
+      - ./downloads:/app/downloads
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - ytdlp-api
+    restart: unless-stopped 
