@@ -11,7 +11,6 @@ import 'package:linkcim/screens/settings_screen.dart';
 import 'package:linkcim/screens/download_history_screen.dart';
 import 'package:linkcim/widgets/video_card.dart';
 import 'package:linkcim/widgets/search_bar.dart';
-import 'package:linkcim/utils/constants.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -198,25 +197,21 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildSystemStatusBanner() {
-    if (systemStatus.isEmpty || !showSystemStatus) return SizedBox.shrink();
-
-    final aiEnabled = systemStatus['ai_enabled'] ?? false;
-    final downloadPermissions = systemStatus['download_permissions'] ?? false;
-    final totalVideos = systemStatus['total_videos'] ?? 0;
+    if (!showSystemStatus || videos.isEmpty) return SizedBox.shrink();
 
     return Container(
       margin: EdgeInsets.all(16),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.indigo[400]!, Colors.indigo[600]!],
+          colors: [Colors.blue[400]!, Colors.blue[600]!],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.indigo.withOpacity(0.3),
+            color: Colors.blue.withOpacity(0.3),
             blurRadius: 8,
             offset: Offset(0, 4),
           ),
@@ -226,10 +221,10 @@ class _HomeScreenState extends State<HomeScreen>
         children: [
           Row(
             children: [
-              Icon(Icons.rocket_launch, color: Colors.white, size: 24),
+              Icon(Icons.analytics, color: Colors.white, size: 24),
               SizedBox(width: 8),
               Text(
-                'Süper Güçlü Sistem Durumu',
+                'Video İstatistikleri',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -243,141 +238,122 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ],
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 16),
+
+          // İstatistik kartları
           Row(
             children: [
               Expanded(
-                child: _buildStatusItem(
-                  '🧠 AI Analizi',
-                  aiEnabled ? 'Aktif' : 'Pasif',
-                  aiEnabled ? Colors.green[300]! : Colors.orange[300]!,
+                child: _buildStatCard(
+                  Icons.video_library,
+                  'Toplam Video',
+                  '${videos.length}',
+                  Colors.white.withOpacity(0.2),
                 ),
               ),
-              SizedBox(width: 8),
+              SizedBox(width: 12),
               Expanded(
-                child: _buildStatusItem(
-                  '📥 İndirme',
-                  downloadPermissions ? 'Hazır' : 'İzin Gerekli',
-                  downloadPermissions ? Colors.green[300]! : Colors.red[300]!,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatusItem(
-                  '📊 Toplam Video',
-                  '$totalVideos video',
-                  Colors.blue[300]!,
-                ),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: _buildStatusItem(
-                  '🎯 Kategoriler',
-                  '${categories.length - 1} kategori',
-                  Colors.purple[300]!,
+                child: _buildStatCard(
+                  Icons.category,
+                  'Kategoriler',
+                  '${categories.length - 1}',
+                  Colors.white.withOpacity(0.2),
                 ),
               ),
             ],
           ),
 
-          // Video istatistikleri bölümü
-          if (videos.isNotEmpty) ...[
-            SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.analytics, color: Colors.white, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Video İstatistikleri',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
+          SizedBox(height: 16),
 
-                  // Platform dağılımı
-                  Text(
-                    'Platform Dağılımı:',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  _buildPlatformStats(),
-
-                  SizedBox(height: 12),
-
-                  // Kategori dağılımı
-                  Text(
-                    'Popüler Kategoriler:',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  _buildCategoryStats(),
-                ],
-              ),
+          // Platform dağılımı
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.white.withOpacity(0.3)),
             ),
-          ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Platform Dağılımı',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 8),
+                _buildPlatformStats(),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 12),
+
+          // Kategori dağılımı
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.white.withOpacity(0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Popüler Kategoriler',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 8),
+                _buildCategoryStats(),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatusItem(String label, String value, Color color) {
+  Widget _buildStatCard(
+      IconData icon, String label, String value, Color backgroundColor) {
     return Container(
-      padding: EdgeInsets.all(8),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withOpacity(0.5)),
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withOpacity(0.3)),
       ),
       child: Column(
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 2),
+          Icon(icon, color: Colors.white, size: 24),
+          SizedBox(height: 8),
           Text(
             value,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 10,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          ),
+          SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.8),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -462,12 +438,12 @@ class _HomeScreenState extends State<HomeScreen>
         ),
         automaticallyImplyLeading: false,
         actions: [
-          // Sistem durumu butonu
+          // İstatistikler butonu
           IconButton(
             icon: Stack(
               children: [
-                Icon(Icons.dashboard),
-                if (systemStatus.isNotEmpty)
+                Icon(Icons.analytics),
+                if (videos.isNotEmpty)
                   Positioned(
                     right: 0,
                     top: 0,
@@ -475,14 +451,14 @@ class _HomeScreenState extends State<HomeScreen>
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: Colors.green,
+                        color: Colors.blue,
                         shape: BoxShape.circle,
                       ),
                     ),
                   ),
               ],
             ),
-            tooltip: 'Sistem Durumu',
+            tooltip: 'Video İstatistikleri',
             onPressed: () =>
                 setState(() => showSystemStatus = !showSystemStatus),
           ),

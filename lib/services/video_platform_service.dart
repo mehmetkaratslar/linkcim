@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:linkcim/utils/constants.dart';
+import 'package:linkcim/services/instagram_service.dart';
 
 class VideoPlatformService {
   static const bool debugMode = true;
@@ -192,31 +193,36 @@ class VideoPlatformService {
   // 📸 Instagram metadata çekme
   static Future<Map<String, dynamic>> _getInstagramMetadata(String url) async {
     try {
-      // Instagram için oEmbed API
-      final oembedUrl =
-          'https://api.instagram.com/oembed/?url=${Uri.encodeComponent(url)}';
+      _debugPrint('Instagram metadata çekiliyor: $url');
 
-      final response = await http.get(
-        Uri.parse(oembedUrl),
-        headers: {'User-Agent': 'Linkcim Video Analyzer 1.0'},
-      ).timeout(Duration(seconds: timeoutSeconds));
+      // Yeni InstagramService'i kullan
+      final result = await InstagramService.getVideoMetadata(url);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
+      if (result['success'] == true) {
         return {
           'success': true,
           'platform': 'Instagram',
-          'title': data['title'] ?? '📸 Instagram Video',
-          'description': _generateDescription(data['title'], 'Instagram'),
-          'author': data['author_name'] ?? 'Bilinmeyen Kullanıcı',
-          'duration': null,
-          'thumbnail': data['thumbnail_url'],
+          'title': result['title'] ?? '📸 Instagram Video',
+          'description': _generateDescription(result['title'], 'Instagram'),
+          'author': result['author'] ??
+              result['author_username'] ??
+              'Bilinmeyen Kullanıcı',
+          'author_username': result['author_username'] ?? '',
+          'duration': result['duration'],
+          'thumbnail': result['thumbnail'] ?? result['estimated_thumbnail'],
           'view_count': null,
-          'upload_date': null,
-          'video_id': _extractInstagramVideoId(url),
+          'upload_date': result['timestamp'] != null
+              ? DateTime.fromMillisecondsSinceEpoch(result['timestamp'] * 1000)
+              : null,
+          'video_id': result['post_id'] ?? _extractInstagramVideoId(url),
           'url': url,
-          'raw_data': data,
+          'raw_data': result,
+          'post_type': result['post_type'],
+          'username': result['username'],
+          'likes': result['likes'],
+          'comments': result['comments'],
+          'hashtags': result['hashtags'] ?? [],
+          'is_video': result['is_video'] ?? true,
         };
       }
 

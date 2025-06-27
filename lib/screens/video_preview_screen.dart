@@ -124,12 +124,197 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
     );
   }
 
+  Color _getPlatformColor() {
+    switch (widget.video.platform.toLowerCase()) {
+      case 'instagram':
+        return Colors.purple;
+      case 'youtube':
+        return Colors.red;
+      case 'tiktok':
+        return Colors.black;
+      case 'twitter':
+        return Colors.blue;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _getVideoType() {
+    final url = widget.video.videoUrl.toLowerCase();
+    if (url.contains('/reel/')) return 'Instagram Reel';
+    if (url.contains('/tv/')) return 'IGTV';
+    if (url.contains('/p/')) return 'Instagram Post';
+    if (url.contains('youtube.com')) return 'YouTube Video';
+    if (url.contains('tiktok.com')) return 'TikTok Video';
+    if (url.contains('twitter.com')) return 'Twitter Video';
+    return 'Video';
+  }
+
+  Widget _buildDetailRow(
+      String label, String value, IconData icon, Color color) {
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Future<void> _downloadVideo() async {
+    // Format seçim dialogu göster
+    final selectedFormat = await _showFormatSelectionDialog();
+    if (selectedFormat == null) return; // Kullanıcı iptal etti
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => DownloadProgressDialog(
         video: widget.video,
+        format: selectedFormat['format'],
+        quality: selectedFormat['quality'],
+      ),
+    );
+  }
+
+  Future<Map<String, String>?> _showFormatSelectionDialog() async {
+    return showDialog<Map<String, String>>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.video_settings, color: Colors.blue[600]),
+            SizedBox(width: 8),
+            Text('Format Seçin'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'İndirmek istediğiniz video formatını ve kalitesini seçin:',
+              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+            ),
+            SizedBox(height: 16),
+
+            // MP4 Video Seçenekleri
+            _buildFormatOption(
+              icon: Icons.video_file,
+              title: 'MP4 Video - Yüksek Kalite',
+              subtitle: '1080p veya mevcut en yüksek kalite',
+              format: 'mp4',
+              quality: 'high',
+              color: Colors.green,
+            ),
+
+            _buildFormatOption(
+              icon: Icons.video_file,
+              title: 'MP4 Video - Orta Kalite',
+              subtitle: '720p kalite, daha küçük dosya boyutu',
+              format: 'mp4',
+              quality: 'medium',
+              color: Colors.blue,
+            ),
+
+            _buildFormatOption(
+              icon: Icons.video_file,
+              title: 'MP4 Video - Düşük Kalite',
+              subtitle: '480p kalite, en küçük dosya boyutu',
+              format: 'mp4',
+              quality: 'low',
+              color: Colors.orange,
+            ),
+
+            SizedBox(height: 8),
+            Divider(),
+            SizedBox(height: 8),
+
+            // MP3 Audio Seçeneği
+            _buildFormatOption(
+              icon: Icons.audio_file,
+              title: 'MP3 Ses',
+              subtitle: 'Sadece ses dosyası (192kbps)',
+              format: 'mp3',
+              quality: 'medium',
+              color: Colors.purple,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('İptal'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormatOption({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String format,
+    required String quality,
+    required Color color,
+  }) {
+    return Card(
+      elevation: 2,
+      margin: EdgeInsets.symmetric(vertical: 4),
+      child: ListTile(
+        leading: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 24),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+        ),
+        onTap: () {
+          Navigator.of(context).pop({
+            'format': format,
+            'quality': quality,
+          });
+        },
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
       ),
     );
   }
@@ -448,31 +633,152 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
 
             SizedBox(height: 20),
 
-            // Video URL gösterimi
+            // Link Detayları Bölümü - Gelişmiş
             Container(
               width: double.infinity,
-              padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
+                gradient: LinearGradient(
+                  colors: [Colors.grey[50]!, Colors.grey[100]!],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.grey[300]!),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Video URL:',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                  // Başlık
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[600],
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.link, color: Colors.white, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'Link Detayları',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 4),
-                  SelectableText(
-                    widget.video.videoUrl,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue[700],
+
+                  // İçerik
+                  Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Platform Bilgisi
+                        _buildDetailRow(
+                          'Platform',
+                          _getPlatformName(),
+                          Icons.public,
+                          _getPlatformColor(),
+                        ),
+
+                        SizedBox(height: 12),
+
+                        // Video Türü
+                        _buildDetailRow(
+                          'Video Türü',
+                          _getVideoType(),
+                          Icons.video_library,
+                          Colors.purple,
+                        ),
+
+                        SizedBox(height: 12),
+
+                        // URL Detayı
+                        _buildDetailRow(
+                          'URL Uzunluğu',
+                          '${widget.video.videoUrl.length} karakter',
+                          Icons.text_fields,
+                          Colors.orange,
+                        ),
+
+                        SizedBox(height: 16),
+
+                        // Tam URL
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey[300]!),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Tam URL:',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              SizedBox(height: 6),
+                              SelectableText(
+                                widget.video.videoUrl,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.blue[700],
+                                  height: 1.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 12),
+
+                        // URL Kopyalama Butonu
+                        Container(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              try {
+                                await ShareService.copyLinkToClipboard(
+                                    widget.video.videoUrl);
+                                _showSuccess('Link panoya kopyalandı! 📋');
+                              } catch (e) {
+                                _showError('Kopyalama başarısız');
+                              }
+                            },
+                            icon: Icon(Icons.copy, size: 18),
+                            label: Text('URL\'yi Kopyala'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey[700],
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

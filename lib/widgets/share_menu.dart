@@ -1,8 +1,9 @@
 // Dosya Konumu: lib/widgets/share_menu.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:linkcim/models/saved_video.dart';
-import 'package:linkcim/services/share_service.dart';
 
 class ShareMenu extends StatelessWidget {
   final SavedVideo video;
@@ -12,9 +13,7 @@ class ShareMenu extends StatelessWidget {
   static Future<void> show(BuildContext context, SavedVideo video) async {
     await showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (context) => ShareMenu(video: video),
     );
   }
@@ -22,153 +21,186 @@ class ShareMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-
-          SizedBox(height: 20),
-
-          // Başlık
-          Text(
-            'Video Paylaş',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          SizedBox(height: 8),
-
-          // Video bilgisi
-          Text(
-            video.title,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 14,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
-
-          SizedBox(height: 24),
-
-          // Paylaşma seçenekleri
-          GridView.count(
-            shrinkWrap: true,
-            crossAxisCount: 3,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 1,
-            children: [
-              _buildShareOption(
-                context,
-                icon: Icons.link,
-                title: 'Sadece Link',
-                color: Colors.blue,
-                onTap: () => _shareOnlyLink(context),
-              ),
-              _buildShareOption(
-                context,
-                icon: Icons.description,
-                title: 'Detaylı',
-                color: Colors.green,
-                onTap: () => _shareDetailed(context),
-              ),
-              _buildShareOption(
-                context,
-                icon: Icons.copy,
-                title: 'Link Kopyala',
-                color: Colors.orange,
-                onTap: () => _copyLink(context),
-              ),
-              _buildShareOption(
-                context,
-                icon: Icons.content_copy,
-                title: 'Detay Kopyala',
-                color: Colors.purple,
-                onTap: () => _copyDetails(context),
-              ),
-              _buildShareOption(
-                context,
-                icon: Icons.email,
-                title: 'Email',
-                color: Colors.red,
-                onTap: () => _shareViaEmail(context),
-              ),
-              _buildShareOption(
-                context,
-                icon: Icons.chat,
-                title: 'WhatsApp',
-                color: Colors.green[700]!,
-                onTap: () => _shareToWhatsApp(context),
-              ),
-            ],
-          ),
-
-          SizedBox(height: 20),
-
-          // İptal butonu
-          SizedBox(
-            width: double.infinity,
-            child: TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'İptal',
-                style: TextStyle(fontSize: 16),
+      margin: EdgeInsets.all(16),
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              margin: EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-          ),
 
-          SizedBox(height: 8),
-        ],
+            SizedBox(height: 16),
+
+            // Başlık
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  Text(
+                    'Paylaş',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    video.title,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 13,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(height: 20),
+
+            // Paylaş seçenekleri
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  // Video linkini paylaş
+                  _buildShareButton(
+                    icon: Icons.share,
+                    title: 'Video Linkini Paylaş',
+                    subtitle: 'Telefonun paylaş menüsü ile',
+                    onTap: () => _shareVideoLink(context),
+                  ),
+
+                  SizedBox(height: 10),
+
+                  // Video detaylarını paylaş
+                  _buildShareButton(
+                    icon: Icons.description,
+                    title: 'Detaylı Bilgi Paylaş',
+                    subtitle: 'Başlık, açıklama ve etiketlerle',
+                    onTap: () => _shareVideoDetails(context),
+                  ),
+
+                  SizedBox(height: 10),
+
+                  // Link kopyala
+                  _buildShareButton(
+                    icon: Icons.copy,
+                    title: 'Linki Kopyala',
+                    subtitle: 'Panoya kopyala',
+                    onTap: () => _copyLink(context),
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(height: 16),
+
+            // İptal butonu
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text(
+                    'İptal',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            SizedBox(height: 12),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildShareOption(
-      BuildContext context, {
-        required IconData icon,
-        required String title,
-        required Color color,
-        required VoidCallback onTap,
-      }) {
+  Widget _buildShareButton({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: Colors.grey[200]!),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Row(
           children: [
-            Icon(
-              icon,
-              color: color,
-              size: 28,
-            ),
-            SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(8),
               ),
-              textAlign: TextAlign.center,
+              child: Icon(
+                icon,
+                color: Colors.blue[600],
+                size: 20,
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  SizedBox(height: 1),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: Colors.grey[400],
             ),
           ],
         ),
@@ -176,63 +208,56 @@ class ShareMenu extends StatelessWidget {
     );
   }
 
-  void _shareOnlyLink(BuildContext context) async {
+  void _shareVideoLink(BuildContext context) async {
     try {
-      await ShareService.shareOnlyLink(video.videoUrl);
+      await Share.share(
+        video.videoUrl,
+        subject: video.title,
+      );
       Navigator.of(context).pop();
-      _showSuccess(context, 'Link paylaşıldı');
+      _showSuccess(context, 'Video linki paylaşıldı');
     } catch (e) {
-      _showError(context, e.toString());
+      _showError(context, 'Paylaşma hatası: $e');
     }
   }
 
-  void _shareDetailed(BuildContext context) async {
+  void _shareVideoDetails(BuildContext context) async {
     try {
-      await ShareService.shareVideoDetails(video);
+      final shareText = '''
+🎬 ${video.title}
+
+📱 Link: ${video.videoUrl}
+
+📝 Açıklama: ${video.description.isNotEmpty ? video.description : 'Açıklama yok'}
+
+🏷️ Kategori: ${video.category}
+
+${video.tags.isNotEmpty ? '🔖 Etiketler: ${video.tags.join(', ')}' : ''}
+
+📅 Tarih: ${video.formattedDate}
+
+---
+Linkcim uygulaması ile paylaşıldı 📱
+''';
+
+      await Share.share(
+        shareText,
+        subject: 'Video: ${video.title}',
+      );
       Navigator.of(context).pop();
-      _showSuccess(context, 'Video detaylı olarak paylaşıldı');
+      _showSuccess(context, 'Video detayları paylaşıldı');
     } catch (e) {
-      _showError(context, e.toString());
+      _showError(context, 'Paylaşma hatası: $e');
     }
   }
 
   void _copyLink(BuildContext context) async {
     try {
-      await ShareService.copyLinkToClipboard(video.videoUrl);
+      await Clipboard.setData(ClipboardData(text: video.videoUrl));
       Navigator.of(context).pop();
       _showSuccess(context, 'Link panoya kopyalandı');
     } catch (e) {
-      _showError(context, e.toString());
-    }
-  }
-
-  void _copyDetails(BuildContext context) async {
-    try {
-      await ShareService.copyVideoDetailsToClipboard(video);
-      Navigator.of(context).pop();
-      _showSuccess(context, 'Video detayları panoya kopyalandı');
-    } catch (e) {
-      _showError(context, e.toString());
-    }
-  }
-
-  void _shareViaEmail(BuildContext context) async {
-    try {
-      await ShareService.shareViaEmail(video);
-      Navigator.of(context).pop();
-      _showSuccess(context, 'Email uygulaması açıldı');
-    } catch (e) {
-      _showError(context, e.toString());
-    }
-  }
-
-  void _shareToWhatsApp(BuildContext context) async {
-    try {
-      await ShareService.shareToWhatsApp(video);
-      Navigator.of(context).pop();
-      _showSuccess(context, 'WhatsApp\'a paylaşıldı');
-    } catch (e) {
-      _showError(context, e.toString());
+      _showError(context, 'Kopyalama hatası: $e');
     }
   }
 
@@ -241,7 +266,8 @@ class ShareMenu extends StatelessWidget {
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -251,7 +277,8 @@ class ShareMenu extends StatelessWidget {
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -293,7 +320,7 @@ class QuickShareButton extends StatelessWidget {
       tooltip: 'Hızlı Paylaş',
       onPressed: () async {
         try {
-          await ShareService.shareVideoLink(video);
+          await Share.share(video.videoUrl, subject: video.title);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Video paylaşıldı'),

@@ -78,27 +78,38 @@ def get_ydl_options(job_id: str, format_type: str, quality: str) -> dict:
         'writethumbnail': True,
         'writeinfojson': True,
         'extractaudio': False,
+        'ignoreerrors': False,
+        'no_warnings': False,
     }
     
+    # Format seçenekleri - daha esnek ve uyumlu
     if format_type == "mp4":
-        base_opts['format'] = 'best[ext=mp4]/mp4/best'
+        # MP4 formatı için esnek seçenekler
+        if quality == "high":
+            base_opts['format'] = 'best[height<=1080]/best[height<=720]/best/mp4'
+        elif quality == "medium":
+            base_opts['format'] = 'best[height<=720]/best[height<=480]/best/mp4'
+        elif quality == "low":
+            base_opts['format'] = 'best[height<=480]/best[height<=360]/best/mp4'
+        else:
+            base_opts['format'] = 'best[ext=mp4]/best'
     elif format_type == "mp3":
         base_opts.update({
-            'format': 'bestaudio/best',
+            'format': 'bestaudio[ext=m4a]/bestaudio/best',
             'extractaudio': True,
             'audioformat': 'mp3',
             'audioquality': '192K',
         })
     else:
-        base_opts['format'] = 'best'
-    
-    # Kalite ayarları
-    if quality == "high":
-        base_opts['format'] = 'best[height<=1080]/best'
-    elif quality == "medium":
-        base_opts['format'] = 'best[height<=720]/best'
-    elif quality == "low":
-        base_opts['format'] = 'best[height<=480]/best'
+        # Genel format - en uyumlu seçenekler
+        if quality == "high":
+            base_opts['format'] = 'best[height<=1080]/best'
+        elif quality == "medium":
+            base_opts['format'] = 'best[height<=720]/best'
+        elif quality == "low":
+            base_opts['format'] = 'best[height<=480]/best'
+        else:
+            base_opts['format'] = 'best/worst'
     
     return base_opts
 

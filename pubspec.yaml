@@ -39,6 +39,12 @@ dependencies:
   # Paylaşma ve clipboard
   share_plus: ^9.0.0
 
+  # Dosya açma - Gelişmiş
+  open_file: ^3.5.4
+
+  # Galeri kayıt
+  gal: ^2.3.0
+
   # Görsel önbellekleme ve resim yönetimi
   cached_network_image: ^3.3.1
 

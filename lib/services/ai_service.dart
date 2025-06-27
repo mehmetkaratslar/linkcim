@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:linkcim/config/api_config.dart'; // Güvenli config dosyası
+import 'package:linkcim/services/api_key_manager.dart';
 
 class AIService {
   static const String _chatCompletionUrl =
@@ -26,20 +26,13 @@ class AIService {
   static DateTime? _lastApiCall;
   static const int minSecondsBetweenCalls = 1;
 
-  // 🔐 API Key'i SharedPreferences'tan veya config'den al
-  static Future<String> get _apiKey async {
+  // 🔐 API Key'i akıllı yönetici ile al
+  static Future<String?> get _apiKey async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final userApiKey = prefs.getString('openai_api_key') ?? '';
-
-      if (userApiKey.isNotEmpty && userApiKey.startsWith('sk-')) {
-        return userApiKey;
-      }
-
-      return ApiConfig.openaiApiKey;
+      return await ApiKeyManager.getActiveApiKey();
     } catch (e) {
       _debugPrint('API anahtarı alınırken hata: $e');
-      return ApiConfig.openaiApiKey;
+      return null;
     }
   }
 
@@ -95,10 +88,11 @@ class AIService {
   // 🎵 WHISPER API - Video sesini metne dönüştür
   static Future<Map<String, dynamic>> transcribeAudio(File audioFile) async {
     final apiKey = await _apiKey;
-    if (apiKey.isEmpty || apiKey == 'YOUR_API_KEY_HERE') {
+    if (apiKey == null || apiKey.isEmpty) {
+      final statusMessage = await ApiKeyManager.getStatusMessage();
       return {
         'success': false,
-        'error': 'API anahtarı ayarlanmamış',
+        'error': 'API kullanım hakkı yok: $statusMessage',
         'transcript': '',
       };
     }
@@ -167,10 +161,11 @@ class AIService {
   // 👁️ VISION API - Görseli analiz et
   static Future<Map<String, dynamic>> analyzeImage(File imageFile) async {
     final apiKey = await _apiKey;
-    if (apiKey.isEmpty || apiKey == 'YOUR_API_KEY_HERE') {
+    if (apiKey == null || apiKey.isEmpty) {
+      final statusMessage = await ApiKeyManager.getStatusMessage();
       return {
         'success': false,
-        'error': 'API anahtarı ayarlanmamış',
+        'error': 'API kullanım hakkı yok: $statusMessage',
         'description': '',
       };
     }
@@ -290,10 +285,13 @@ JSON formatında yanıt ver:
     }
 
     final apiKey = await _apiKey;
-    if (apiKey.isEmpty || apiKey == 'YOUR_API_KEY_HERE') {
-      _debugPrint('⚠️ API anahtarı yok, basit analiz kullanılıyor');
+    if (apiKey == null || apiKey.isEmpty) {
+      _debugPrint('⚠️ API kullanım hakkı yok, basit analiz kullanılıyor');
       return simpleAnalyze(title ?? '');
     }
+
+    // API kullanımını artır
+    await ApiKeyManager.incrementUsage();
 
     if (!await _checkConnectivity()) {
       _debugPrint('⚠️ İnternet yok, basit analiz kullanılıyor');
@@ -600,7 +598,7 @@ JSON formatında yanıt ver:
   // API bağlantı testi
   static Future<bool> testApiConnection() async {
     final apiKey = await _apiKey;
-    if (apiKey.isEmpty || apiKey == 'YOUR_API_KEY_HERE') {
+    if (apiKey == null || apiKey.isEmpty) {
       return false;
     }
 
@@ -727,8 +725,8 @@ JSON formatında yanıt ver:
 
     // 2. API Key kontrolü
     final apiKey = await _apiKey;
-    _debugPrint('🔍 API Key Uzunluğu: ${apiKey.length}');
-    _debugPrint('🔍 API Key Başlangıcı: ${apiKey.startsWith('sk-')}');
+    _debugPrint('🔍 API Key Uzunluğu: ${apiKey?.length ?? 0}');
+    _debugPrint('🔍 API Key Başlangıcı: ${apiKey?.startsWith('sk-') ?? false}');
 
     // 3. İnternet bağlantısı
     final hasInternet = await _checkConnectivity();

@@ -74,18 +74,31 @@ class VideoThumbnail extends StatelessWidget {
   }
 
   Widget _buildThumbnailImage(String thumbnailUrl) {
-    if (thumbnailUrl.isNotEmpty) {
+    // Instagram thumbnail'ları artık çalışmıyor, platform bazlı placeholder göster
+    final platform = _getPlatformFromUrl(videoUrl);
+
+    if (thumbnailUrl.isNotEmpty && platform != 'instagram') {
       return CachedNetworkImage(
         imageUrl: thumbnailUrl,
         fit: fit,
-        placeholder: (context, url) => _buildPlaceholder(),
-        errorWidget: (context, url, error) => _buildErrorWidget(),
+        placeholder: (context, url) => _buildPlatformPlaceholder(platform),
+        errorWidget: (context, url, error) =>
+            _buildPlatformPlaceholder(platform),
         fadeInDuration: Duration(milliseconds: 300),
         fadeOutDuration: Duration(milliseconds: 300),
       );
     } else {
-      return _buildPlaceholder();
+      return _buildPlatformPlaceholder(platform);
     }
+  }
+
+  String _getPlatformFromUrl(String url) {
+    if (url.contains('instagram.com')) return 'instagram';
+    if (url.contains('youtube.com') || url.contains('youtu.be'))
+      return 'youtube';
+    if (url.contains('tiktok.com')) return 'tiktok';
+    if (url.contains('twitter.com') || url.contains('x.com')) return 'twitter';
+    return 'unknown';
   }
 
   Widget _buildPlaceholder() {
@@ -111,6 +124,84 @@ class VideoThumbnail extends StatelessWidget {
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlatformPlaceholder(String platform) {
+    Color platformColor;
+    IconData platformIcon;
+    String platformName;
+
+    switch (platform) {
+      case 'instagram':
+        platformColor = Colors.purple;
+        platformIcon = Icons.camera_alt;
+        platformName = 'Instagram';
+        break;
+      case 'youtube':
+        platformColor = Colors.red;
+        platformIcon = Icons.play_circle_filled;
+        platformName = 'YouTube';
+        break;
+      case 'tiktok':
+        platformColor = Colors.black;
+        platformIcon = Icons.music_video;
+        platformName = 'TikTok';
+        break;
+      case 'twitter':
+        platformColor = Colors.blue;
+        platformIcon = Icons.video_camera_back;
+        platformName = 'Twitter';
+        break;
+      default:
+        platformColor = Colors.grey;
+        platformIcon = Icons.video_library;
+        platformName = 'Video';
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            platformColor.withOpacity(0.1),
+            platformColor.withOpacity(0.05),
+          ],
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: platformColor.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              platformIcon,
+              size: 24,
+              color: platformColor,
+            ),
+          ),
+          SizedBox(height: 8),
+          Flexible(
+            child: Text(
+              platformName,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: platformColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
         ],

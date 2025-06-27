@@ -7,6 +7,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
 import 'package:linkcim/services/database_service.dart';
 import 'package:linkcim/services/ai_service.dart';
+import 'package:linkcim/services/api_key_manager.dart';
 import 'package:linkcim/screens/download_history_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -18,17 +19,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final DatabaseService _dbService = DatabaseService();
   final TextEditingController _apiKeyController = TextEditingController();
 
-  int totalVideos = 0;
-  int totalCategories = 0;
-  int totalTags = 0;
   bool aiAnalysisEnabled = true;
-  String currentApiKey = '';
   bool hasValidApiKey = false;
 
   @override
   void initState() {
     super.initState();
-    _loadStats();
     _loadSettings();
   }
 
@@ -41,11 +37,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _loadSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+
+      // API key durumunu yeni ApiKeyManager ile kontrol et
+      final hasUserApiKey = await ApiKeyManager.hasUserApiKey();
+
       setState(() {
         aiAnalysisEnabled = prefs.getBool('ai_analysis_enabled') ?? true;
-        currentApiKey = prefs.getString('openai_api_key') ?? '';
-        hasValidApiKey = _validateApiKey(currentApiKey);
-        _apiKeyController.text = currentApiKey;
+        hasValidApiKey = hasUserApiKey;
       });
     } catch (e) {
       print('Ayarlar yüklenirken hata: $e');
@@ -56,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('ai_analysis_enabled', aiAnalysisEnabled);
-      await prefs.setString('openai_api_key', currentApiKey);
+      // API key artık ApiKeyManager ile yönetiliyor
     } catch (e) {
       print('Ayarlar kaydedilirken hata: $e');
     }
@@ -64,22 +62,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   bool _validateApiKey(String key) {
     return key.isNotEmpty && key.startsWith('sk-') && key.length > 20;
-  }
-
-  Future<void> _loadStats() async {
-    try {
-      final videoCount = await _dbService.getVideoCount();
-      final categories = await _dbService.getAllCategories();
-      final tags = await _dbService.getAllTags();
-
-      setState(() {
-        totalVideos = videoCount;
-        totalCategories = categories.length;
-        totalTags = tags.length;
-      });
-    } catch (e) {
-      print('Istatistik yuklenirken hata: $e');
-    }
   }
 
   void _showError(String message) {
@@ -95,35 +77,65 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _showApiKeyDialog() async {
-    _apiKeyController.text = currentApiKey;
+    final currentUserKey = await ApiKeyManager.getUserApiKey();
+    _apiKeyController.text = currentUserKey ?? '';
 
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('OpenAI API Anahtarı'),
+        title: Row(
+          children: [
+            Icon(Icons.key, color: Colors.blue),
+            SizedBox(width: 8),
+            Text('OpenAI API Anahtarı'),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'OpenAI API anahtarınızı girin. Bu, video başlıklarını AI ile analiz etmek için gereklidir.',
-              style: TextStyle(fontSize: 14),
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue[200]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '🎁 Ücretsiz Deneme',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue[700],
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Her kullanıcı 10 kez ücretsiz AI analizi yapabilir. Sonrasında kendi OpenAI API anahtarınızı girin.',
+                    style: TextStyle(fontSize: 12, color: Colors.blue[600]),
+                  ),
+                ],
+              ),
             ),
             SizedBox(height: 16),
             TextField(
               controller: _apiKeyController,
               decoration: InputDecoration(
-                labelText: 'API Anahtarı',
-                hintText: 'sk-...',
+                labelText: 'API Anahtarı (İsteğe Bağlı)',
+                hintText: 'sk-proj-...',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.key),
+                helperText:
+                    'Sınırsız kullanım için kendi API anahtarınızı girin',
               ),
               obscureText: true,
               maxLines: 1,
             ),
             SizedBox(height: 8),
             Text(
-              'API anahtarı "sk-" ile başlamalıdır',
+              'API anahtarı "sk-" ile başlamalıdır. OpenAI hesabınızdan alabilirsiniz.',
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
@@ -136,7 +148,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           TextButton(
             onPressed: () {
               final key = _apiKeyController.text.trim();
-              if (_validateApiKey(key)) {
+              if (key.isEmpty) {
+                Navigator.of(context).pop('REMOVE'); // API key'i kaldır
+              } else if (_validateApiKey(key)) {
                 Navigator.of(context).pop(key);
               } else {
                 _showError('Geçersiz API anahtarı formatı');
@@ -149,12 +163,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
     if (result != null) {
+      if (result == 'REMOVE') {
+        await ApiKeyManager.removeUserApiKey();
+        _showSuccess(
+            'API anahtarı kaldırıldı. Ücretsiz kullanıma geri döndünüz.');
+      } else {
+        final success = await ApiKeyManager.setUserApiKey(result);
+        if (success) {
+          _showSuccess(
+              'API anahtarı başarıyla kaydedildi. Artık sınırsız kullanabilirsiniz!');
+        } else {
+          _showError('API anahtarı kaydedilemedi');
+        }
+      }
       setState(() {
-        currentApiKey = result;
-        hasValidApiKey = _validateApiKey(result);
+        hasValidApiKey = result != 'REMOVE';
       });
-      await _saveSettings();
-      _showSuccess('API anahtarı başarıyla kaydedildi');
+    }
+  }
+
+  Future<void> _removeApiKey() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.warning, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('API Anahtarını Kaldır'),
+          ],
+        ),
+        content: Text(
+          'API anahtarınızı kaldırmak istediğinizden emin misiniz? '
+          'Ücretsiz kullanım limitine geri döneceksiniz.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('İptal'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text('Kaldır', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await ApiKeyManager.removeUserApiKey();
+      setState(() {
+        hasValidApiKey = false;
+      });
+      _showSuccess(
+          'API anahtarı kaldırıldı. Ücretsiz kullanıma geri döndünüz.');
     }
   }
 
@@ -390,7 +453,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
 
       _showSuccess('Tum veriler silindi');
-      _loadStats();
     } catch (e) {
       _showError('Veri silinirken hata olustu: $e');
     }
@@ -416,25 +478,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildStatTile(
-      String title, String value, IconData icon, Color color) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: color.withOpacity(0.1),
-        child: Icon(icon, color: color),
-      ),
-      title: Text(title),
-      trailing: Text(
-        value,
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: color,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -443,43 +486,112 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: ListView(
         children: [
-          // Istatistikler
-          _buildSection('Istatistikler', [
-            _buildStatTile(
-              'Toplam Video',
-              '$totalVideos',
-              Icons.video_library,
-              Colors.blue,
-            ),
-            _buildStatTile(
-              'Kategori Sayisi',
-              '$totalCategories',
-              Icons.category,
-              Colors.green,
-            ),
-            _buildStatTile(
-              'Etiket Sayisi',
-              '$totalTags',
-              Icons.tag,
-              Colors.orange,
-            ),
-          ]),
-
-          Divider(),
-
           // AI ayarlari
           _buildSection('Yapay Zeka Ayarları', [
+            // API Kullanım Durumu
+            FutureBuilder<Map<String, dynamic>>(
+              future: ApiKeyManager.getUsageStats(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final stats = snapshot.data!;
+                  final hasUserKey = stats['has_user_key'] ?? false;
+                  final currentUsage = stats['current_usage'] ?? 0;
+                  final remaining = stats['remaining_free'] ?? 0;
+                  final canUseAI = stats['can_use_ai'] ?? false;
+
+                  return Container(
+                    margin: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: hasUserKey
+                            ? [Colors.green[400]!, Colors.green[600]!]
+                            : canUseAI
+                                ? [Colors.blue[400]!, Colors.blue[600]!]
+                                : [Colors.orange[400]!, Colors.orange[600]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (hasUserKey
+                                  ? Colors.green
+                                  : canUseAI
+                                      ? Colors.blue
+                                      : Colors.orange)
+                              .withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              hasUserKey ? Icons.key : Icons.smart_toy,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'AI Kullanım Durumu',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          hasUserKey
+                              ? '🔑 Kendi API anahtarınızı kullanıyorsunuz'
+                              : canUseAI
+                                  ? '🎁 Ücretsiz kullanım: $remaining hakkınız kaldı'
+                                  : '⚠️ Ücretsiz kullanım hakkınız bitti',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        if (!hasUserKey) ...[
+                          SizedBox(height: 8),
+                          LinearProgressIndicator(
+                            value: currentUsage / 10,
+                            backgroundColor: Colors.white.withOpacity(0.3),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            '$currentUsage/10 kullanım',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                }
+                return SizedBox.shrink();
+              },
+            ),
+
             ListTile(
               leading: Icon(
                 Icons.smart_toy,
                 color: aiAnalysisEnabled ? Colors.purple : Colors.grey,
               ),
               title: Text('AI Video Analizi'),
-              subtitle: Text(
-                hasValidApiKey
-                    ? 'OpenAI ile gelişmiş analiz aktif'
-                    : 'API anahtarı gerekli - şu an basit analiz',
-              ),
+              subtitle: Text('Video içeriğini otomatik analiz et'),
               trailing: Switch(
                 value: aiAnalysisEnabled,
                 onChanged: (value) {
@@ -492,26 +604,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
             ),
+
             ListTile(
               leading: Icon(
                 Icons.key,
-                color: hasValidApiKey ? Colors.green : Colors.red,
+                color: hasValidApiKey ? Colors.green : Colors.blue,
               ),
               title: Text('OpenAI API Anahtarı'),
               subtitle: Text(
                 hasValidApiKey
-                    ? '✅ API anahtarı ayarlanmış'
-                    : '❌ API anahtarı gerekli',
+                    ? 'Kendi API anahtarınızı kullanıyorsunuz'
+                    : 'Sınırsız kullanım için kendi API anahtarınızı girin',
               ),
               onTap: _showApiKeyDialog,
             ),
-            if (hasValidApiKey)
+
+            if (hasValidApiKey) ...[
               ListTile(
                 leading: Icon(Icons.science, color: Colors.blue),
                 title: Text('API Anahtarını Test Et'),
                 subtitle: Text('Bağlantıyı ve çalışmayı kontrol et'),
                 onTap: _testApiKey,
               ),
+              ListTile(
+                leading: Icon(Icons.delete_outline, color: Colors.red),
+                title: Text('API Anahtarını Kaldır'),
+                subtitle: Text('Ücretsiz kullanıma geri dön'),
+                onTap: _removeApiKey,
+              ),
+            ],
           ]),
 
           Divider(),
@@ -585,30 +706,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     builder: (context) => DownloadHistoryScreen(),
                   ),
                 );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.refresh, color: Colors.blue),
-              title: Text('Istatistikleri Yenile'),
-              subtitle: Text('Guncel sayilari getir'),
-              onTap: _loadStats,
-            ),
-            ListTile(
-              leading: Icon(Icons.download, color: Colors.green),
-              title: Text('Verileri Disa Aktar'),
-              subtitle: Text('Yakin zamanda eklenecek'),
-              enabled: false,
-              onTap: () {
-                _showError('Bu ozellik henuz hazir degil');
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.upload, color: Colors.orange),
-              title: Text('Verileri Ice Aktar'),
-              subtitle: Text('Yakin zamanda eklenecek'),
-              enabled: false,
-              onTap: () {
-                _showError('Bu ozellik henuz hazir degil');
               },
             ),
             ListTile(

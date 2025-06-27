@@ -4,30 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:linkcim/services/database_service.dart';
 import 'package:linkcim/screens/home_screen.dart';
-import 'package:linkcim/screens/splash_screen.dart';
 
 void main() async {
-  // Flutter framework'ün başlatılmasını bekle
+  // Flutter framework'ü başlat
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Sistem UI ayarları
-  SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.white,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ),
-  );
-
-  // Sadece portrait modunda çalışacak şekilde ayarla
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-
+  // Veritabanını başlat
   try {
-    // Veritabanını başlat
     await DatabaseService().initDB();
     print('✅ Veritabanı başarıyla başlatıldı');
   } catch (e) {
@@ -150,8 +133,8 @@ class LinkciApp extends StatelessWidget {
         splashFactory: InkRipple.splashFactory,
       ),
 
-      // Başlangıç sayfası
-      home: SplashScreen(),
+      // Başlangıç sayfası - Direkt ana ekran
+      home: HomeScreen(),
 
       // Route generator (gelecekte deep linking için)
       onGenerateRoute: (settings) {

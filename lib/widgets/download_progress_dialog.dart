@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:linkcim/models/saved_video.dart';
 import 'package:linkcim/services/video_download_service.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'dart:io';
 
 class DownloadProgressDialog extends StatefulWidget {
   final SavedVideo video;
+  final String? format;
+  final String? quality;
 
   const DownloadProgressDialog({
     Key? key,
     required this.video,
+    this.format = 'mp4',
+    this.quality = 'medium',
   }) : super(key: key);
 
   @override
@@ -39,6 +45,8 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
         videoUrl: widget.video.videoUrl,
         platform: widget.video.platform,
         customFileName: _generateFileName(),
+        format: widget.format ?? 'mp4',
+        quality: widget.quality ?? 'medium',
         onProgress: (downloadProgress) {
           setState(() {
             progress = downloadProgress;
@@ -54,6 +62,9 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
           status = 'İndirme tamamlandı!';
           downloadedFilePath = result['file_path'];
         });
+
+        // İndirme geçmişine kaydet
+        await _saveToDownloadHistory(result);
       } else {
         setState(() {
           hasError = true;
@@ -77,8 +88,71 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
         .replaceAll(RegExp(r'[<>:"/\\|?*]'), '_')
         .replaceAll(RegExp(r'\s+'), '_')
         .toLowerCase();
+    final extension = widget.format ?? 'mp4';
 
-    return '${platform}_${cleanTitle}_$timestamp.mp4';
+    return '${platform}_${cleanTitle}_$timestamp.$extension';
+  }
+
+  Future<void> _saveToDownloadHistory(Map<String, dynamic> result) async {
+    try {
+      final filePath = result['file_path'] as String;
+      var fileSize = result['file_size'] as int? ?? 0;
+      final fileName = filePath.split('/').last;
+
+      // Dosya boyutunu kontrol et
+      if (fileSize == 0) {
+        try {
+          final file = File(filePath);
+          if (await file.exists()) {
+            fileSize = await file.length();
+          }
+        } catch (e) {
+          print('Dosya boyutu okunamadı: $e');
+        }
+      }
+      final downloadDate = DateTime.now();
+
+      // Hive veritabanına kaydet
+      final box = await Hive.openBox('downloadHistory');
+      final currentHistory = box.get('downloads', defaultValue: <dynamic>[]);
+      final historyList = <Map<String, dynamic>>[];
+
+      // Mevcut verileri güvenli şekilde dönüştür
+      if (currentHistory is List) {
+        for (var item in currentHistory) {
+          if (item is Map) {
+            historyList.add(Map<String, dynamic>.from(item));
+          }
+        }
+      }
+
+      // Yeni indirme kaydı
+      final downloadRecord = {
+        'file_name': fileName,
+        'file_path': filePath,
+        'file_size': fileSize,
+        'download_date': downloadDate,
+        'title': widget.video.title,
+        'platform': widget.video.platform,
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      };
+
+      // Listeye ekle (en yeniler başta)
+      historyList.insert(0, downloadRecord);
+
+      // Maksimum 100 kayıt tut
+      if (historyList.length > 100) {
+        historyList.removeRange(100, historyList.length);
+      }
+
+      // Veritabanına kaydet
+      await box.put('downloads', historyList);
+
+      print(
+          '📝 İndirme geçmişine kaydedildi: $fileName (${historyList.length} toplam kayıt)');
+    } catch (e) {
+      print('❌ Geçmiş kaydetme hatası: $e');
+    }
   }
 
   @override
