@@ -46,16 +46,55 @@
 
 ## 📸 Ekran Görüntüleri
 
-<div align="center">
+<!-- Merkezde hizalanmış, esnek 3-lü kart yerleşimi -->
+<div style="
+     display:flex;
+     justify-content:center;
+     gap:24px;          /* Kartlar arası boşluk */
+     flex-wrap:wrap;    /* Ekran daralınca alt satıra geçsin */
+">
 
-| Ana Sayfa | Video Ekleme | AI Analizi | İndirme Geçmişi |
-|-----------|--------------|------------|-----------------|
-| ![Ana Sayfa](![anasayfa](https://github.com/user-attachments/assets/56a92ce1-ec76-43df-abff-f1bba201ed2f)
-) | ![Video Ekleme](![videoEkleme](https://github.com/user-attachments/assets/dd7cc2a6-4c2e-4e6d-8954-5aaec7e45bc7)
-) | | ![Geçmiş](![geçmiş](https://github.com/user-attachments/assets/d52a3f39-ba79-4e79-851b-4a1f096d5154)
-) |
+  <!-- Ana Sayfa Kartı -->
+  <div style="
+       width:180px;
+       text-align:center;
+  ">
+    <img
+      src="https://github.com/user-attachments/assets/56a92ce1-ec76-43df-abff-f1bba201ed2f"
+      alt="Ana Sayfa"
+      style="max-width:100%; border-radius:8px;"
+    />
+    <strong>Ana Sayfa</strong>
+  </div>
+
+  <!-- Video Ekleme Kartı -->
+  <div style="
+       width:180px;
+       text-align:center;
+  ">
+    <img
+      src="https://github.com/user-attachments/assets/dd7cc2a6-4c2e-4e6d-8954-5aaec7e45bc7"
+      alt="Video Ekleme"
+      style="max-width:100%; border-radius:8px;"
+    />
+    <strong>Video Ekleme</strong>
+  </div>
+
+  <!-- İndirme Geçmişi Kartı -->
+  <div style="
+       width:180px;
+       text-align:center;
+  ">
+    <img
+      src="https://github.com/user-attachments/assets/d52a3f39-ba79-4e79-851b-4a1f096d5154"
+      alt="İndirme Geçmişi"
+      style="max-width:100%; border-radius:8px;"
+    />
+    <strong>İndirme&nbsp;Geçmişi</strong>
+  </div>
 
 </div>
+
 
 ## 🚀 Kurulum
 
