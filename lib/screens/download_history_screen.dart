@@ -228,10 +228,10 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
   }
 
   Widget _buildDownloadItem(Map<String, dynamic> item, int index) {
-    final fileName = item['file_name'] as String;
-    final filePath = item['file_path'] as String;
-    final fileSize = item['file_size'] as int;
-    final downloadDate = item['download_date'] as DateTime;
+    final fileName = item['file_name'] as String? ?? 'Bilinmeyen Dosya';
+    final filePath = item['file_path'] as String? ?? '';
+    final fileSize = item['file_size'] as int? ?? 0;
+    final downloadDate = item['download_date'] as DateTime? ?? DateTime.now();
     final platform = _extractPlatformFromFileName(fileName);
 
     return Card(
