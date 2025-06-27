@@ -4,12 +4,12 @@
 
 ![Linkcim Logo](assets/icons/icon.png)
 
-**🚀 Instagram, YouTube, TikTok, Twitter videolarını indir, kategorize et ve AI ile organize et!**
+**🚀 Instagram, YouTube, TikTok, Twitter(X) videolarını indir, kategorize et ve AI ile organize et!**
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.0+-blue.svg)](https://flutter.dev/)
 [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/)
 [![Version](https://img.shields.io/badge/Version-2.0.3-orange.svg)](https://github.com/mehmetkaratslar/linkcim/releases)
-[![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
+
 
 </div>
 
