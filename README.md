@@ -1,4 +1,4 @@
-# 📱 Linkcim v2.0 - Süper Güçlü Video İndirme ve AI Analiz Uygulaması
+# 📱 Linkcim v2.0
 
 <div align="center">
 
