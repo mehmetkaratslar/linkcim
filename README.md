@@ -17,11 +17,11 @@
 
 ### 🤖 **AI Destekli Analiz Sistemi**
 - **Akıllı Video Analizi**: OpenAI GPT ile otomatik başlık, kategori ve etiket önerileri
-- **Platform Metadata**: Instagram, YouTube, TikTok, Twitter için otomatik bilgi çekme
+- **Platform Metadata**: Instagram, YouTube, TikTok, Twitter(X) için otomatik bilgi çekme
 - **Kullanıcı Başına 10 Ücretsiz Analiz**: Kendi API key'inizi ekleyerek sınırsız kullanım
 
-### 📥 **Süper İndirme Sistemi**
-- **Çoklu Platform Desteği**: Instagram, YouTube, TikTok, Twitter
+### 📥 **İndirme Sistemi**
+- **Çoklu Platform Desteği**: Instagram, YouTube, TikTok, Twitter(X)
 - **Yüksek Kalite İndirme**: En iyi kalitede video indirme
 - **Otomatik Galeri Kaydı**: İndirilen videolar otomatik olarak galerinize kaydedilir
 - **İndirme Progress**: Gerçek zamanlı indirme durumu gösterimi
@@ -67,7 +67,7 @@
 
 ### 📱 **Android APK İndirme**
 
-1. **GitHub Releases**'den en son APK'yı indirin:
+1. **GitHub Releases**'den en son APK'yı indirin en güncel versiyo 2 'dir:
    https://github.com/mehmetkaratslar/linkcim/releases/latest
    
 
@@ -128,23 +128,9 @@ flutter run
 ## 🛡️ Güvenlik ve Gizlilik
 
 - **Yerel Depolama**: Tüm verileriniz cihazınızda güvenle saklanır
-- **Şifreleme**: Hassas veriler şifrelenmiş olarak saklanır
 - **Gizlilik**: Kişisel bilgileriniz hiçbir yere gönderilmez
 - **Açık Kaynak**: Kod tamamen açık ve incelenebilir
 
-## 🌟 Öne Çıkan Yenilikler v2.0
-
-### ✨ **Yeni Özellikler**
-- 🤖 **AI Analiz Sistemi** - OpenAI GPT entegrasyonu
-- 🎨 **Modern UI Tasarımı** - Tamamen yenilenen arayüz
-- 📥 **Gelişmiş İndirme** - Daha hızlı ve güvenilir indirme
-- 🖼️ **Gerçek Thumbnail'lar** - Video kapakları artık görünüyor
-
-### 🔧 **İyileştirmeler**
-- ⚡ **Performans Optimizasyonu** - %40 daha hızlı
-- 🎯 **Basitleştirilmiş Arayüz** - Daha kolay kullanım
-- 🔍 **Gelişmiş Arama** - Daha akıllı arama algoritması
-- 📱 **Responsive Tasarım** - Tüm ekranlarda mükemmel görünüm
 
 ## 🤝 Katkıda Bulunma
 
@@ -156,38 +142,14 @@ Katkılarınızı memnuniyetle karşılıyoruz!
 4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
 5. Pull Request oluşturun
 
-## 📝 Changelog
-
-### v2.0.3 (Son Sürüm)
-- 🔧 Ana sayfa overflow sorunu düzeltildi
-- 📱 Responsive tasarım iyileştirmeleri
-- 🎨 Empty state tasarımı optimize edildi
-
-### v2.0.2
-- 🗂️ Arama sayfası basitleştirildi
-- ❌ Filtre butonu kaldırıldı
-- ⚡ Performans optimizasyonu
-
-### v2.0.1
-- 🚨 Search screen overflow hatası düzeltildi
-- ⏱️ Thumbnail timeout süreleri optimize edildi
-- 🎯 UI performans iyileştirmeleri
-
-### v2.0.0
-- 🤖 AI Analiz sistemi eklendi
-- 🎨 Modern UI tasarımı
-- 📥 Gelişmiş indirme sistemi
-- 🖼️ Gerçek video thumbnail'ları
 
 ## 📞 İletişim
 
 - **Geliştirici**: Mehmet Karatslar
 - **GitHub**: [@mehmetkaratslar](https://github.com/mehmetkaratslar)
-- **Email**: [İletişim](mailto:your-email@example.com)
+- **Email**: [İletişim](mailto:mehmetkarataslar@gmail.com)
 
-## 📄 Lisans
 
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
 
 ---
 
