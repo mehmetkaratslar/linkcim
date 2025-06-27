@@ -330,53 +330,53 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
         ),
         actions: [
           if (downloadHistory.isNotEmpty)
-            Container(
+                    Container(
               margin: EdgeInsets.only(right: 16),
               child: Center(
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
+                      decoration: BoxDecoration(
+                        color: Colors.blue[50],
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '${downloadHistory.length} video',
-                    style: TextStyle(
-                      color: Colors.blue[700],
+                                style: TextStyle(
+                                  color: Colors.blue[700],
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+                                ),
+                              ),
+                                ),
+                              ),
+                            ],
+                          ),
       body: isLoading
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                            children: [
                   CircularProgressIndicator(color: Colors.blue),
                   SizedBox(height: 16),
-                  Text(
+                              Text(
                     'Videolar yükleniyor...',
                     style: TextStyle(color: Colors.grey[600]),
-                  ),
-                ],
-              ),
+                              ),
+                            ],
+                          ),
             )
           : downloadHistory.isEmpty
               ? _buildEmptyState()
               : RefreshIndicator(
                   onRefresh: _loadDownloadHistory,
-                  child: ListView.builder(
+                      child: ListView.builder(
                     padding: EdgeInsets.all(16),
-                    itemCount: downloadHistory.length,
-                    itemBuilder: (context, index) {
+                        itemCount: downloadHistory.length,
+                        itemBuilder: (context, index) {
                       return _buildDownloadItem(downloadHistory[index], index);
-                    },
-                  ),
+                        },
+                      ),
                 ),
     );
   }
@@ -396,7 +396,7 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
             child: Icon(
               Icons.video_library_outlined,
               size: 60,
-              color: Colors.grey[400],
+            color: Colors.grey[400],
             ),
           ),
           SizedBox(height: 24),
@@ -452,18 +452,18 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: Container(
+      child: Container(
           padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               // Üst kısım - Platform badge ve tarih
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
+                  decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
                           _getPlatformColor(platform),
@@ -489,9 +489,9 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
                         ),
                         SizedBox(width: 6),
                         Text(
-                          platform,
-                          style: TextStyle(
-                            color: Colors.white,
+                    platform,
+                    style: TextStyle(
+                      color: Colors.white,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -506,43 +506,43 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
-                      _formatDate(downloadDate),
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
+                  _formatDate(downloadDate),
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                ],
-              ),
+                ),
+              ],
+            ),
 
               SizedBox(height: 20),
 
-              // Video bilgileri
-              Row(
-                children: [
+            // Video bilgileri
+            Row(
+              children: [
                   // Video thumbnail - gerçek video kapağı
                   _buildVideoThumbnail(filePath),
 
                   SizedBox(width: 16),
 
                   // Video detayları - daha güzel
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          fileName.replaceAll('.mp4', '').replaceAll('_', ' '),
-                          style: TextStyle(
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        fileName.replaceAll('.mp4', '').replaceAll('_', ' '),
+                        style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 16,
                             color: Colors.grey[800],
                             height: 1.3,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                         SizedBox(height: 8),
                         Container(
                           padding:
@@ -553,39 +553,39 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: [
+                        children: [
                               Icon(Icons.storage_rounded,
-                                  size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 4),
-                              Text(
-                                _formatFileSize(fileSize),
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 12,
+                              size: 16, color: Colors.grey[600]),
+                          SizedBox(width: 4),
+                          Text(
+                            _formatFileSize(fileSize),
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12,
                                   fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                          ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
 
               SizedBox(height: 20),
 
               // Alt kısım - Şık butonlar (Galeriye kaydet butonu kaldırıldı)
-              Row(
-                children: [
+            Row(
+              children: [
                   // Oynatma butonu - ana buton
-                  Expanded(
+                Expanded(
                     flex: 3,
                     child: Container(
                       height: 50,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _playVideo(filePath, fileName),
+                  child: ElevatedButton.icon(
+                    onPressed: () => _playVideo(filePath, fileName),
                         icon: Icon(Icons.play_arrow_rounded, size: 22),
                         label: Text(
                           'Oynat',
@@ -594,28 +594,28 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
                             fontSize: 16,
                           ),
                         ),
-                        style: ElevatedButton.styleFrom(
+                    style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue[600],
-                          foregroundColor: Colors.white,
+                      foregroundColor: Colors.white,
                           elevation: 4,
                           shadowColor: Colors.blue.withOpacity(0.4),
-                          shape: RoundedRectangleBorder(
+                      shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18),
                           ),
                         ),
-                      ),
                     ),
                   ),
+                ),
 
                   SizedBox(width: 12),
 
                   // Paylaşma butonu - daha büyük
-                  Expanded(
+                Expanded(
                     flex: 2,
                     child: Container(
                       height: 50,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _shareFile(filePath),
+                  child: ElevatedButton.icon(
+                    onPressed: () => _shareFile(filePath),
                         icon: Icon(Icons.share_rounded, size: 2),
                         label: Text(
                           'Paylaş',
@@ -624,26 +624,26 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
                             fontSize: 12,
                           ),
                         ),
-                        style: ElevatedButton.styleFrom(
+                    style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange[600],
-                          foregroundColor: Colors.white,
+                      foregroundColor: Colors.white,
                           elevation: 4,
                           shadowColor: Colors.orange.withOpacity(0.4),
-                          shape: RoundedRectangleBorder(
+                      shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18),
                           ),
                         ),
-                      ),
                     ),
                   ),
+                ),
 
                   SizedBox(width: 12),
 
                   // Menü butonu - daha şık ve büyük
-                  Container(
+                Container(
                     width: 50,
                     height: 50,
-                    decoration: BoxDecoration(
+                  decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [Colors.grey[100]!, Colors.grey[50]!],
                         begin: Alignment.topLeft,
@@ -658,50 +658,50 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
                           offset: Offset(0, 2),
                         ),
                       ],
-                    ),
-                    child: PopupMenuButton<String>(
-                      onSelected: (value) {
-                        switch (value) {
-                          case 'info':
-                            _showFileInfo(item);
-                            break;
-                          case 'delete':
-                            _deleteFile(filePath, index);
-                            break;
-                        }
-                      },
+                  ),
+                  child: PopupMenuButton<String>(
+                    onSelected: (value) {
+                      switch (value) {
+                        case 'info':
+                          _showFileInfo(item);
+                          break;
+                        case 'delete':
+                          _deleteFile(filePath, index);
+                          break;
+                      }
+                    },
                       icon: Icon(Icons.more_vert_rounded,
                           color: Colors.grey[700], size: 22),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          value: 'info',
-                          child: Row(
-                            children: [
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'info',
+                        child: Row(
+                          children: [
                               Icon(Icons.info_outline, color: Colors.blue),
                               SizedBox(width: 12),
-                              Text('Detaylar'),
-                            ],
-                          ),
+                            Text('Detaylar'),
+                          ],
                         ),
-                        PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
                               Icon(Icons.delete_outline, color: Colors.red),
                               SizedBox(width: 12),
                               Text('Sil'),
-                            ],
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
+          ],
           ),
         ),
       ),
@@ -744,7 +744,7 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
       case 'twitter':
         return Colors.blue;
       default:
-        return Colors.grey;
+    return Colors.grey;
     }
   }
 

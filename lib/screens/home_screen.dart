@@ -602,40 +602,38 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildEmptyState() {
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(32),
+              padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.blue[50],
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.rocket_launch,
-                size: 64,
+                size: 48,
                 color: Colors.blue[400],
               ),
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 20),
             Text(
-              videos.isEmpty
-                  ? 'Henüz video eklemediniz'
-                  : 'Arama kriterinize uygun video bulunamadı',
+              videos.isEmpty ? 'Henüz video eklemediniz' : 'Video bulunamadı',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey[700],
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 12),
+            SizedBox(height: 8),
             Text(
               videos.isEmpty
-                  ? 'İlk videonuzu eklemek için aşağıdaki butona tıklayın.\nSüper güçlü AI analizi ve indirme sistemi ile\nvideolarınızı organize edin!'
-                  : 'Farklı anahtar kelimeler deneyin veya\nkategori filtrelerini kontrol edin',
+                  ? 'İlk videonuzu eklemek için aşağıdaki butona tıklayın.'
+                  : 'Farklı anahtar kelimeler deneyin.',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[500],
@@ -643,7 +641,7 @@ class _HomeScreenState extends State<HomeScreen>
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 32),
+            SizedBox(height: 24),
             if (videos.isEmpty) ...[
               ElevatedButton.icon(
                 onPressed: () {
@@ -656,23 +654,23 @@ class _HomeScreenState extends State<HomeScreen>
                     }
                   });
                 },
-                icon: Icon(Icons.rocket_launch),
+                icon: Icon(Icons.add),
                 label: Text('İlk Videonuzu Ekleyin'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[600],
                   foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 12),
               Wrap(
                 alignment: WrapAlignment.center,
-                spacing: 8,
-                runSpacing: 8,
+                spacing: 6,
+                runSpacing: 6,
                 children: [
                   _buildFeatureChip('🧠 AI Analizi'),
-                  _buildFeatureChip('📥 Süper İndirme'),
-                  _buildFeatureChip('🎯 Akıllı Kategori'),
+                  _buildFeatureChip('📥 İndirme'),
+                  _buildFeatureChip('🎯 Kategori'),
                 ],
               ),
             ],

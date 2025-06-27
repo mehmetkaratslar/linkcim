@@ -61,13 +61,13 @@ class VideoDownloadService {
 
           // Yazma izni test et
           final testFile = File('${externalDir.path}/.test_write');
-          await testFile.writeAsString('test');
-          await testFile.delete();
+            await testFile.writeAsString('test');
+            await testFile.delete();
 
           _debugPrint(
               '✅ External Downloads klasörü kullanılıyor: ${externalDir.path}');
           return externalDir;
-        } catch (e) {
+          } catch (e) {
           _debugPrint('⚠️ External storage erişimi yok: $e');
         }
 
@@ -113,8 +113,8 @@ class VideoDownloadService {
     _debugPrint('🚀 Python API ile video indirme başlatılıyor: $videoUrl');
 
     try {
-      // İzin kontrolü
-      await requestPermissions();
+    // İzin kontrolü
+    await requestPermissions();
 
       // 1️⃣ Python API'ye indirme isteği gönder
       final startResult =
@@ -163,16 +163,16 @@ class VideoDownloadService {
 
   // 🌟 PLATFORM DESTEĞİ KONTROL ET
   static Future<Map<String, dynamic>> getSupportedPlatforms() async {
-    try {
-      final response = await http.get(
+        try {
+          final response = await http.get(
         Uri.parse('$_baseUrl/platforms'),
-        headers: {
+            headers: {
           'Authorization': 'Bearer $_apiKey',
           'Content-Type': 'application/json',
         },
       ).timeout(Duration(seconds: 10));
 
-      if (response.statusCode == 200) {
+          if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return {
           'success': true,
@@ -180,8 +180,8 @@ class VideoDownloadService {
         };
       } else {
         throw Exception('HTTP ${response.statusCode}');
-      }
-    } catch (e) {
+          }
+        } catch (e) {
       _debugPrint('❌ Platform listesi alınamadı: $e');
       return {
         'success': false,
@@ -216,22 +216,22 @@ class VideoDownloadService {
 
   // 🔥 HEALTH CHECK - API ÇALIŞIYOR MU?
   static Future<Map<String, dynamic>> checkApiHealth() async {
-    try {
-      final response = await http.get(
+        try {
+          final response = await http.get(
         Uri.parse('$_baseUrl/health'),
-        headers: {
+            headers: {
           'Authorization': 'Bearer $_apiKey',
         },
       ).timeout(Duration(seconds: 10));
 
-      if (response.statusCode == 200) {
+          if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return {
-          'success': true,
+          return {
+            'success': true,
           'status': 'healthy',
           'data': data,
-        };
-      } else {
+          };
+        } else {
         throw Exception('API Health Check Failed: ${response.statusCode}');
       }
     } catch (e) {
@@ -269,7 +269,7 @@ class VideoDownloadService {
         return true;
       } else {
         _debugPrint('⚠️ Dosya bulunamadı: $filePath');
-        return false;
+      return false;
       }
     } catch (e) {
       _debugPrint('❌ Dosya silinirken hata: $e');
@@ -425,14 +425,14 @@ class VideoDownloadService {
       _debugPrint('⬇️ Tamamlanan dosya indiriliyor: $jobId');
 
       final downloadUrl = '$_baseUrl/download/$jobId';
-      final response = await http.get(
+        final response = await http.get(
         Uri.parse(downloadUrl),
-        headers: {
+          headers: {
           'Authorization': 'Bearer $_apiKey',
-        },
+          },
       );
 
-      if (response.statusCode == 200) {
+        if (response.statusCode == 200) {
         // Dosya adını oluştur
         final title = jobData['title'] ?? 'video';
         final platform = jobData['platform'] ?? 'unknown';
