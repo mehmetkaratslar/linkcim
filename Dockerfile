@@ -28,5 +28,6 @@ EXPOSE 8000
 
 # 8) Uygulama başlangıç komutu
 #    - "sh -c" ile kabuk açıyoruz, böylece $PORT genişleyebiliyor
-#    - ${PORT:-8000} → PORT tanımlı değilse 8000 kullan
+
+# PORT tanımlıysa onu, tanımlı değilse 8000'i kullanır
 CMD ["sh", "-c", "uvicorn api:app --host 0.0.0.0 --port ${PORT:-8000}"]
