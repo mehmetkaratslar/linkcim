@@ -1,61 +1,396 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from pathlib import Path
-import yt_dlp, uuid, os
+import yt_dlp
+import uuid
+import os
+import json
+import time
+import asyncio
+import threading
+from typing import Optional, Dict, Any
+import logging
 
 # --- Ayarlar ---
-API_KEY = os.getenv("API_KEY", "your-secret-api-key")
-DOWNLOAD_DIR = Path("downloads"); DOWNLOAD_DIR.mkdir(exist_ok=True)
-app = FastAPI(title="yt-dlp API", version="1.0.0")
+API_KEY = os.getenv("API_KEY", "45541d717524a99df5f994bb9f6cbce825269852be079594b8e35f7752d6f1bd")
+DOWNLOAD_DIR = Path("downloads")
+DOWNLOAD_DIR.mkdir(exist_ok=True)
+
+app = FastAPI(title="🎬 Linkcim Video Download API", version="2.0.0")
 security = HTTPBearer()
-jobs = {}
+
+# CORS ayarları
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Global job storage
+jobs: Dict[str, Dict[str, Any]] = {}
+
+# Logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # --- Modeller ---
-class Req(BaseModel):
+class DownloadRequest(BaseModel):
     url: str
     format: str = "mp4"
+    quality: str = "best"
+    platform: Optional[str] = None
 
-# --- Yardımcılar ---
-def check_key(creds: HTTPAuthorizationCredentials = Depends(security)):
-    if creds.credentials != API_KEY:
-        raise HTTPException(status_code=401, detail="API key hatalı")
+class DownloadResponse(BaseModel):
+    job_id: str
+    status: str
+    message: str
 
-async def worker(job_id, url, fmt):
-    jobs[job_id] = {"status": "downloading", "progress": 0}
-    opts = {
-        "format": fmt,
-        "outtmpl": str(DOWNLOAD_DIR / f"{job_id}.%(ext)s"),
-        "progress_hooks": [lambda d: jobs[job_id].update(progress=float(d.get('_percent_str','0').replace('%','')) if d['status']=='downloading' else {})],
+# --- Yardımcı Fonksiyonlar ---
+def check_api_key(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    if credentials.credentials != API_KEY:
+        raise HTTPException(status_code=401, detail="🔐 API anahtarı hatalı!")
+
+def get_platform_from_url(url: str) -> str:
+    """URL'den platform tespit et"""
+    url_lower = url.lower()
+    if 'youtube.com' in url_lower or 'youtu.be' in url_lower:
+        return 'youtube'
+    elif 'instagram.com' in url_lower:
+        return 'instagram'
+    elif 'tiktok.com' in url_lower:
+        return 'tiktok'
+    elif 'twitter.com' in url_lower or 'x.com' in url_lower:
+        return 'twitter'
+    elif 'facebook.com' in url_lower:
+        return 'facebook'
+    else:
+        return 'unknown'
+
+def get_ydl_options(job_id: str, format_type: str, quality: str) -> dict:
+    """Platform ve kaliteye göre yt-dlp seçenekleri"""
+    base_opts = {
+        'outtmpl': str(DOWNLOAD_DIR / f"{job_id}.%(ext)s"),
+        'writethumbnail': True,
+        'writeinfojson': True,
+        'extractaudio': False,
     }
+    
+    if format_type == "mp4":
+        base_opts['format'] = 'best[ext=mp4]/mp4/best'
+    elif format_type == "mp3":
+        base_opts.update({
+            'format': 'bestaudio/best',
+            'extractaudio': True,
+            'audioformat': 'mp3',
+            'audioquality': '192K',
+        })
+    else:
+        base_opts['format'] = 'best'
+    
+    # Kalite ayarları
+    if quality == "high":
+        base_opts['format'] = 'best[height<=1080]/best'
+    elif quality == "medium":
+        base_opts['format'] = 'best[height<=720]/best'
+    elif quality == "low":
+        base_opts['format'] = 'best[height<=480]/best'
+    
+    return base_opts
+
+async def download_worker(job_id: str, url: str, format_type: str, quality: str):
+    """Async video indirme worker'ı"""
     try:
-        with yt_dlp.YoutubeDL(opts) as ydl:
+        jobs[job_id] = {
+            "status": "starting",
+            "progress": 0,
+            "url": url,
+            "platform": get_platform_from_url(url),
+            "format": format_type,
+            "quality": quality,
+            "created_at": time.time(),
+            "file_path": None,
+            "file_size": 0,
+            "duration": None,
+            "title": None,
+            "thumbnail": None,
+            "error": None
+        }
+        
+        logger.info(f"🚀 İndirme başlatılıyor: {job_id} - {url}")
+        
+        def progress_hook(d):
+            if d['status'] == 'downloading':
+                try:
+                    percent_str = d.get('_percent_str', '0%').replace('%', '')
+                    percent = float(percent_str) if percent_str.replace('.', '').isdigit() else 0
+                    jobs[job_id].update({
+                        "status": "downloading",
+                        "progress": percent,
+                        "speed": d.get('_speed_str', 'N/A'),
+                        "eta": d.get('_eta_str', 'N/A'),
+                        "downloaded": d.get('_downloaded_bytes_str', 'N/A'),
+                        "total": d.get('_total_bytes_str', 'N/A')
+                    })
+                except Exception as e:
+                    logger.error(f"Progress güncelleme hatası: {e}")
+            elif d['status'] == 'finished':
+                jobs[job_id].update({
+                    "status": "processing",
+                    "progress": 100,
+                    "message": "İşleniyor..."
+                })
+        
+        # yt-dlp seçenekleri
+        ydl_opts = get_ydl_options(job_id, format_type, quality)
+        ydl_opts['progress_hooks'] = [progress_hook]
+        
+        # İndirme işlemi
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            # Video bilgilerini al
+            try:
+                info = ydl.extract_info(url, download=False)
+                jobs[job_id].update({
+                    "title": info.get('title', 'Bilinmiyor'),
+                    "duration": info.get('duration', 0),
+                    "uploader": info.get('uploader', 'Bilinmiyor'),
+                    "view_count": info.get('view_count', 0)
+                })
+            except Exception as e:
+                logger.warning(f"Video bilgisi alınamadı: {e}")
+            
+            # Video indir
+            jobs[job_id]["status"] = "downloading"
             ydl.download([url])
-        jobs[job_id]["status"] = "completed"
-        jobs[job_id]["file"] = next(DOWNLOAD_DIR.glob(f"{job_id}.*")).as_posix()
+        
+        # İndirilen dosyayı bul
+        downloaded_files = list(DOWNLOAD_DIR.glob(f"{job_id}.*"))
+        video_file = None
+        
+        for file in downloaded_files:
+            if file.suffix.lower() in ['.mp4', '.webm', '.mkv', '.avi', '.mov', '.mp3', '.m4a']:
+                video_file = file
+                break
+        
+        if video_file and video_file.exists():
+            file_size = video_file.stat().st_size
+            jobs[job_id].update({
+                "status": "completed",
+                "progress": 100,
+                "file_path": str(video_file),
+                "file_size": file_size,
+                "completed_at": time.time(),
+                "message": "✅ İndirme tamamlandı!"
+            })
+            
+            # Thumbnail dosyasını bul
+            thumbnail_files = list(DOWNLOAD_DIR.glob(f"{job_id}.*"))
+            for thumb in thumbnail_files:
+                if thumb.suffix.lower() in ['.jpg', '.jpeg', '.png', '.webp']:
+                    jobs[job_id]["thumbnail"] = str(thumb)
+                    break
+                    
+            logger.info(f"✅ İndirme tamamlandı: {job_id} - {video_file.name}")
+        else:
+            raise Exception("İndirilen dosya bulunamadı")
+            
     except Exception as e:
-        jobs[job_id] = {"status":"failed","error":str(e)}
+        error_msg = str(e)
+        logger.error(f"❌ İndirme hatası: {job_id} - {error_msg}")
+        jobs[job_id].update({
+            "status": "failed",
+            "error": error_msg,
+            "failed_at": time.time()
+        })
 
-# --- Rotalar ---
+# --- API Rotaları ---
+@app.get("/")
+def root():
+    return {
+        "name": "🎬 Linkcim Video Download API",
+        "version": "2.0.0",
+        "status": "running",
+        "supported_platforms": [
+            "YouTube", "Instagram", "TikTok", "Twitter/X", 
+            "Facebook", "Vimeo", "Dailymotion", "Reddit"
+        ]
+    }
+
 @app.get("/health")
-def health(): return {"status":"ok","jobs":len(jobs)}
+def health():
+    active_jobs = len([j for j in jobs.values() if j["status"] in ["downloading", "processing"]])
+    completed_jobs = len([j for j in jobs.values() if j["status"] == "completed"])
+    failed_jobs = len([j for j in jobs.values() if j["status"] == "failed"])
+    
+    return {
+        "status": "healthy",
+        "total_jobs": len(jobs),
+        "active_jobs": active_jobs,
+        "completed_jobs": completed_jobs,
+        "failed_jobs": failed_jobs,
+        "uptime": time.time()
+    }
 
-@app.post("/download", dependencies=[Depends(check_key)])
-def start(req: Req, bg: BackgroundTasks):
-    job_id = str(uuid.uuid4())
-    fmt = "best[ext=mp4]/best" if req.format=="mp4" else "best"
-    bg.add_task(worker, job_id, req.url, fmt)
-    return {"job_id": job_id, "status": "queued"}
+@app.post("/download", dependencies=[Depends(check_api_key)])
+async def start_download(request: DownloadRequest, background_tasks: BackgroundTasks):
+    """🚀 Video indirme işlemini başlat"""
+    try:
+        job_id = str(uuid.uuid4())
+        platform = request.platform or get_platform_from_url(request.url)
+        
+        logger.info(f"📥 Yeni indirme isteği: {platform} - {request.url}")
+        
+        # Background task olarak indirme işlemini başlat
+        background_tasks.add_task(
+            download_worker, 
+            job_id, 
+            request.url, 
+            request.format, 
+            request.quality
+        )
+        
+        return DownloadResponse(
+            job_id=job_id,
+            status="queued",
+            message=f"🎬 {platform.title()} videosu indirme kuyruğuna eklendi"
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ İndirme başlatma hatası: {e}")
+        raise HTTPException(status_code=400, detail=f"İndirme başlatılamadı: {str(e)}")
 
-@app.get("/status/{job_id}", dependencies=[Depends(check_key)])
-def status(job_id: str):
-    if job_id not in jobs: raise HTTPException(404, "Job yok")
-    return jobs[job_id]
+@app.get("/status/{job_id}", dependencies=[Depends(check_api_key)])
+def get_download_status(job_id: str):
+    """📊 İndirme durumunu kontrol et"""
+    if job_id not in jobs:
+        raise HTTPException(status_code=404, detail="❌ İş bulunamadı")
+    
+    job = jobs[job_id].copy()
+    
+    # Hassas bilgileri temizle
+    if "error" in job and job["error"]:
+        job["error"] = str(job["error"])[:200]  # Hata mesajını kısalt
+    
+    return job
 
-@app.get("/download/{job_id}", dependencies=[Depends(check_key)])
-def fetch(job_id: str):
-    job = jobs.get(job_id)
-    if not job or job.get("status") != "completed":
-        raise HTTPException(400, "Hazır değil")
-    return FileResponse(job["file"], filename=os.path.basename(job["file"]))
+@app.get("/download/{job_id}", dependencies=[Depends(check_api_key)])
+def download_file(job_id: str):
+    """📥 Tamamlanan dosyayı indir"""
+    if job_id not in jobs:
+        raise HTTPException(status_code=404, detail="❌ İş bulunamadı")
+    
+    job = jobs[job_id]
+    
+    if job.get("status") != "completed":
+        raise HTTPException(
+            status_code=400, 
+            detail=f"❌ Dosya henüz hazır değil. Durum: {job.get('status', 'unknown')}"
+        )
+    
+    file_path = job.get("file_path")
+    if not file_path or not Path(file_path).exists():
+        raise HTTPException(status_code=404, detail="❌ Dosya bulunamadı")
+    
+    filename = job.get("title", "video")
+    # Dosya adını temizle
+    filename = "".join(c for c in filename if c.isalnum() or c in (' ', '-', '_')).rstrip()
+    filename = f"{filename}.{Path(file_path).suffix[1:]}"
+    
+    return FileResponse(
+        file_path, 
+        filename=filename,
+        media_type='application/octet-stream'
+    )
+
+@app.get("/jobs", dependencies=[Depends(check_api_key)])
+def list_all_jobs():
+    """📋 Tüm işleri listele"""
+    return {
+        "total": len(jobs),
+        "jobs": [
+            {
+                "job_id": job_id,
+                "status": job["status"],
+                "platform": job.get("platform", "unknown"),
+                "title": job.get("title", "Bilinmiyor"),
+                "progress": job.get("progress", 0),
+                "created_at": job.get("created_at"),
+                "completed_at": job.get("completed_at"),
+                "file_size": job.get("file_size", 0)
+            }
+            for job_id, job in jobs.items()
+        ]
+    }
+
+@app.delete("/job/{job_id}", dependencies=[Depends(check_api_key)])
+def delete_job(job_id: str):
+    """🗑️ İşi ve dosyasını sil"""
+    if job_id not in jobs:
+        raise HTTPException(status_code=404, detail="❌ İş bulunamadı")
+    
+    job = jobs[job_id]
+    
+    # Dosyaları sil
+    if job.get("file_path"):
+        try:
+            Path(job["file_path"]).unlink(missing_ok=True)
+        except Exception as e:
+            logger.warning(f"Dosya silinirken hata: {e}")
+    
+    # Thumbnail'i sil
+    if job.get("thumbnail"):
+        try:
+            Path(job["thumbnail"]).unlink(missing_ok=True)
+        except Exception as e:
+            logger.warning(f"Thumbnail silinirken hata: {e}")
+    
+    # İşi sil
+    del jobs[job_id]
+    
+    return {"message": "✅ İş ve dosyalar silindi"}
+
+@app.get("/platforms")
+def get_supported_platforms():
+    """🌐 Desteklenen platformları listele"""
+    return {
+        "platforms": {
+            "youtube": {
+                "name": "YouTube",
+                "formats": ["mp4", "mp3"],
+                "qualities": ["high", "medium", "low"],
+                "features": ["thumbnails", "metadata", "playlists"]
+            },
+            "instagram": {
+                "name": "Instagram",
+                "formats": ["mp4"],
+                "qualities": ["high", "medium"],
+                "features": ["stories", "reels", "posts"]
+            },
+            "tiktok": {
+                "name": "TikTok",
+                "formats": ["mp4"],
+                "qualities": ["high", "medium"],
+                "features": ["no-watermark", "metadata"]
+            },
+            "twitter": {
+                "name": "Twitter/X",
+                "formats": ["mp4"],
+                "qualities": ["high", "medium"],
+                "features": ["multiple-videos"]
+            },
+            "facebook": {
+                "name": "Facebook",
+                "formats": ["mp4"],
+                "qualities": ["high", "medium"],
+                "features": ["posts", "stories"]
+            }
+        }
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")

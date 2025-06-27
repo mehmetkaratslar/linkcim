@@ -5,10 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 
 class YtdlpApiService {
-  static const String baseUrl =
-      'http://192.168.181.141:8000'; // Gerçek telefon için PC IP
+  static const String baseUrl = 'http://localhost:8000'; // Local Python API
   static const String apiKey =
-      '45541d717524a99df5f994bb9f6cbce825269852be079594b8e35f7752d6f1bd'; // docker-compose.yml'deki API key
+      '45541d717524a99df5f994bb9f6cbce825269852be079594b8e35f7752d6f1bd';
 
   static final Dio _dio = Dio();
 
@@ -176,7 +175,7 @@ class YtdlpApiService {
   static Future<Map<String, dynamic>> deleteJob(String jobId) async {
     try {
       final response = await http.delete(
-        Uri.parse('$baseUrl/download/$jobId'),
+        Uri.parse('$baseUrl/job/$jobId'),
         headers: {
           'Authorization': 'Bearer $apiKey',
         },
@@ -199,144 +198,5 @@ class YtdlpApiService {
         'error': 'Network error: $e',
       };
     }
-  }
-}
-
-// Enhanced Video Download Service Integration
-class EnhancedVideoDownloadService {
-  static Future<Map<String, dynamic>> downloadVideoWithApi({
-    required String url,
-    String format = 'mp4',
-    Function(double)? onProgress,
-  }) async {
-    try {
-      print('🚀 API ile video indirme başlatılıyor: $url');
-
-      // 1. API sağlık kontrolü
-      if (!await YtdlpApiService.checkHealth()) {
-        print('❌ API sunucusu erişilemez durumda');
-        return {
-          'success': false,
-          'error': 'API sunucusu erişilemez durumda',
-        };
-      }
-
-      print('✅ API sunucusu aktif');
-
-      // 2. İndirme başlat
-      final startResult = await YtdlpApiService.startDownload(
-        url: url,
-        format: format,
-      );
-
-      if (!startResult['success']) {
-        print('❌ İndirme başlatılamadı: ${startResult['error']}');
-        return startResult;
-      }
-
-      final jobId = startResult['data']['job_id'];
-      print('✅ İndirme işi oluşturuldu: $jobId');
-
-      String fileName = 'video_$jobId.$format';
-      String? videoTitle;
-
-      // 3. İndirme durumunu takip et
-      int attempts = 0;
-      const maxAttempts = 150; // 5 dakika (2 saniye * 150)
-
-      while (attempts < maxAttempts) {
-        await Future.delayed(Duration(seconds: 2));
-        attempts++;
-
-        final statusResult = await YtdlpApiService.getDownloadStatus(jobId);
-
-        if (!statusResult['success']) {
-          print('❌ Durum kontrolü başarısız: ${statusResult['error']}');
-          return statusResult;
-        }
-
-        final status = statusResult['data'];
-        final currentStatus = status['status'];
-        final progress = status['progress']?.toDouble() ?? 0.0;
-
-        print('📊 Durum: $currentStatus, İlerleme: %${progress.toInt()}');
-
-        // Progress callback
-        if (onProgress != null) {
-          onProgress(progress);
-        }
-
-        if (currentStatus == 'completed') {
-          videoTitle = status['title'];
-          fileName = _sanitizeFileName(videoTitle ?? fileName);
-          print('✅ İndirme tamamlandı: $fileName');
-          break;
-        } else if (currentStatus == 'failed') {
-          print('❌ İndirme başarısız: ${status['error']}');
-          return {
-            'success': false,
-            'error': status['error'] ?? 'İndirme başarısız',
-          };
-        }
-      }
-
-      if (attempts >= maxAttempts) {
-        print('❌ İndirme zaman aşımına uğradı');
-        return {
-          'success': false,
-          'error': 'İndirme zaman aşımına uğradı',
-        };
-      }
-
-      // 4. Dosyayı cihaza indir
-      print('📥 Dosya cihaza indiriliyor...');
-      final downloadResult = await YtdlpApiService.downloadFile(
-        jobId: jobId,
-        fileName: fileName,
-        onProgress: (received, total) {
-          if (onProgress != null && total > 0) {
-            final fileProgress = 95 + (received / total * 5); // %95-100 arası
-            onProgress(fileProgress);
-          }
-        },
-      );
-
-      if (downloadResult['success']) {
-        print('✅ Video başarıyla indirildi: ${downloadResult['file_path']}');
-
-        // Sunucudaki işi temizle (opsiyonel)
-        await YtdlpApiService.deleteJob(jobId);
-      }
-
-      return downloadResult;
-    } catch (e) {
-      print('❌ İndirme hatası: $e');
-      return {
-        'success': false,
-        'error': 'İndirme hatası: $e',
-      };
-    }
-  }
-
-  // Dosya adını temizle (geçersiz karakterleri kaldır)
-  static String _sanitizeFileName(String fileName) {
-    return fileName
-        .replaceAll(
-            RegExp(r'[<>:"/\\|?*]'), '_') // Windows geçersiz karakterleri
-        .replaceAll(RegExp(r'\s+'), '_') // Boşlukları alt çizgi ile değiştir
-        .substring(
-            0, fileName.length > 100 ? 100 : fileName.length); // Uzunluk sınırı
-  }
-
-  // Mevcut video download service ile uyumluluk için
-  static Future<Map<String, dynamic>> downloadVideo({
-    required String url,
-    Function(double)? onProgress,
-  }) async {
-    return await downloadVideoWithApi(
-      url: url,
-      format: 'mp4',
-      onProgress: onProgress,
-    );
   }
 }

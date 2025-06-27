@@ -100,7 +100,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
                       ? Colors.green
                       : Colors.blue,
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 hasError
@@ -131,7 +131,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
                     children: [
                       Text(widget.video.platformIcon,
                           style: TextStyle(fontSize: 16)),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
                         widget.video.platform.toUpperCase(),
                         style: TextStyle(
@@ -142,7 +142,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     widget.video.title,
                     style: TextStyle(
@@ -156,7 +156,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
               ),
             ),
 
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Progress bar (sadece indirme sırasında)
             if (!hasError && !isCompleted) ...[
@@ -165,7 +165,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
                 backgroundColor: Colors.grey[300],
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
             ],
 
             // Status mesajı
@@ -183,7 +183,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
 
             // Hata mesajı
             if (hasError && errorMessage != null) ...[
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -203,7 +203,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
 
             // Başarı mesajı
             if (isCompleted && downloadedFilePath != null) ...[
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -222,7 +222,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       'Dosya: ${downloadedFilePath!.split('/').last}',
                       style: TextStyle(
@@ -240,7 +240,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
           if (isCompleted || hasError)
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Tamam'),
+              child: const Text('Tamam'),
             )
           else
             TextButton(
@@ -248,7 +248,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
                 // TODO: İndirmeyi iptal etme özelliği eklenebilir
                 Navigator.of(context).pop();
               },
-              child: Text('İptal'),
+              child: const Text('İptal'),
             ),
         ],
       ),

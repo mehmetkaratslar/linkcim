@@ -247,18 +247,23 @@ class VideoCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildTestResultRow('Platform:', testResult['platform']),
-            _buildTestResultRow('URL Durumu:', testResult['success'] ? 'Başarılı' : 'Başarısız'),
+            _buildTestResultRow('URL Durumu:',
+                testResult['success'] ? 'Başarılı' : 'Başarısız'),
             if (testResult['video_url'] != null)
               _buildTestResultRow('Video URL:', 'Bulundu ✓'),
             if (testResult['is_valid'] != null)
-              _buildTestResultRow('Geçerlilik:', testResult['is_valid'] ? 'Geçerli ✓' : 'Geçersiz ✗'),
+              _buildTestResultRow('Geçerlilik:',
+                  testResult['is_valid'] ? 'Geçerli ✓' : 'Geçersiz ✗'),
             SizedBox(height: 8),
             Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: testResult['success'] ? Colors.green[50] : Colors.red[50],
+                color:
+                    testResult['success'] ? Colors.green[50] : Colors.red[50],
                 border: Border.all(
-                  color: testResult['success'] ? Colors.green[200]! : Colors.red[200]!,
+                  color: testResult['success']
+                      ? Colors.green[200]!
+                      : Colors.red[200]!,
                 ),
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -266,7 +271,9 @@ class VideoCard extends StatelessWidget {
                 testResult['message'] ?? 'Test tamamlandı',
                 style: TextStyle(
                   fontSize: 12,
-                  color: testResult['success'] ? Colors.green[700] : Colors.red[700],
+                  color: testResult['success']
+                      ? Colors.green[700]
+                      : Colors.red[700],
                 ),
               ),
             ),
@@ -314,7 +321,8 @@ class VideoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildHighlightedText(BuildContext context, String text, String? highlight) {
+  Widget _buildHighlightedText(
+      BuildContext context, String text, String? highlight) {
     if (highlight == null || highlight.isEmpty) {
       return Text(text);
     }
@@ -411,12 +419,12 @@ class VideoCard extends StatelessWidget {
                                   horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: Color(AppConstants.getPlatformColor(
-                                    video.platform))
+                                        video.platform))
                                     .withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: Color(AppConstants.getPlatformColor(
-                                      video.platform))
+                                          video.platform))
                                       .withOpacity(0.3),
                                 ),
                               ),
@@ -780,7 +788,8 @@ class VideoCard extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.rocket_launch, size: 14, color: Colors.green[700]),
+                    Icon(Icons.rocket_launch,
+                        size: 14, color: Colors.green[700]),
                     SizedBox(width: 6),
                     Expanded(
                       child: Text(
@@ -857,7 +866,8 @@ class _SuperDownloadProgressDialogState
   Future<void> _startSuperDownload() async {
     try {
       setState(() {
-        status = '🚀 ${widget.downloadType.toUpperCase()} indirme başlatılıyor...';
+        status =
+            '🚀 ${widget.downloadType.toUpperCase()} indirme başlatılıyor...';
         currentStep = 'Sistem hazırlanıyor';
       });
 
@@ -870,7 +880,6 @@ class _SuperDownloadProgressDialogState
         case 'fast':
           result = await VideoDownloadService.downloadVideoFast(
             videoUrl: widget.video.videoUrl,
-            platform: widget.video.platform,
             customFileName: _generateFileName(),
             onProgress: _updateProgress,
           );
@@ -878,7 +887,6 @@ class _SuperDownloadProgressDialogState
         case 'mobile':
           result = await VideoDownloadService.downloadVideoMobile(
             videoUrl: widget.video.videoUrl,
-            platform: widget.video.platform,
             customFileName: _generateFileName(),
             onProgress: _updateProgress,
           );
@@ -896,7 +904,8 @@ class _SuperDownloadProgressDialogState
         setState(() {
           isCompleted = true;
           progress = 1.0;
-          status = '🎉 ${widget.downloadType.toUpperCase()} indirme tamamlandı!';
+          status =
+              '🎉 ${widget.downloadType.toUpperCase()} indirme tamamlandı!';
           downloadedFilePath = result['file_path'];
           totalBytes = result['file_size'] ?? 0;
           downloadedBytes = totalBytes;
@@ -966,8 +975,8 @@ class _SuperDownloadProgressDialogState
                   colors: hasError
                       ? [Colors.red[400]!, Colors.red[600]!]
                       : isCompleted
-                      ? [Colors.green[400]!, Colors.green[600]!]
-                      : [Colors.blue[400]!, Colors.blue[600]!],
+                          ? [Colors.green[400]!, Colors.green[600]!]
+                          : [Colors.blue[400]!, Colors.blue[600]!],
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -975,8 +984,8 @@ class _SuperDownloadProgressDialogState
                 hasError
                     ? Icons.error
                     : isCompleted
-                    ? Icons.check_circle
-                    : Icons.rocket_launch,
+                        ? Icons.check_circle
+                        : Icons.rocket_launch,
                 color: Colors.white,
                 size: 24,
               ),
@@ -990,8 +999,8 @@ class _SuperDownloadProgressDialogState
                     hasError
                         ? 'İndirme Başarısız'
                         : isCompleted
-                        ? 'İndirme Tamamlandı!'
-                        : 'Süper ${widget.downloadType.toUpperCase()} İndirme',
+                            ? 'İndirme Tamamlandı!'
+                            : 'Süper ${widget.downloadType.toUpperCase()} İndirme',
                     style: TextStyle(fontSize: 16),
                   ),
                   if (_getElapsedTime().isNotEmpty)
@@ -1036,7 +1045,8 @@ class _SuperDownloadProgressDialogState
                       ),
                       Spacer(),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: _getDownloadTypeColor().withOpacity(0.2),
                           borderRadius: BorderRadius.circular(8),
@@ -1094,7 +1104,8 @@ class _SuperDownloadProgressDialogState
                   LinearProgressIndicator(
                     value: progress,
                     backgroundColor: Colors.grey[300],
-                    valueColor: AlwaysStoppedAnimation<Color>(_getDownloadTypeColor()),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(_getDownloadTypeColor()),
                     minHeight: 8,
                   ),
                   if (totalBytes > 0) ...[
@@ -1116,14 +1127,14 @@ class _SuperDownloadProgressDialogState
                 color: hasError
                     ? Colors.red[50]
                     : isCompleted
-                    ? Colors.green[50]
-                    : Colors.blue[50],
+                        ? Colors.green[50]
+                        : Colors.blue[50],
                 border: Border.all(
                   color: hasError
                       ? Colors.red[200]!
                       : isCompleted
-                      ? Colors.green[200]!
-                      : Colors.blue[200]!,
+                          ? Colors.green[200]!
+                          : Colors.blue[200]!,
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -1138,8 +1149,8 @@ class _SuperDownloadProgressDialogState
                       color: hasError
                           ? Colors.red[700]
                           : isCompleted
-                          ? Colors.green[700]
-                          : Colors.blue[700],
+                              ? Colors.green[700]
+                              : Colors.blue[700],
                     ),
                   ),
                   if (currentStep.isNotEmpty && !isCompleted && !hasError) ...[
