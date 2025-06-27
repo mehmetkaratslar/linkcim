@@ -402,6 +402,78 @@ def get_supported_platforms():
         }
     }
 
+@app.get("/api/thumbnail")
+async def get_video_thumbnail(url: str):
+    """🖼️ Video thumbnail'ını al"""
+    try:
+        logger.info(f"🖼️ Thumbnail isteniyor: {url}")
+        
+        # Platform tespit et
+        platform = get_platform_from_url(url)
+        
+        # yt-dlp ile video bilgilerini al (indirmeden)
+        ydl_opts = {
+            'quiet': True,
+            'no_warnings': True,
+            'extract_flat': False,
+            'writethumbnail': False,
+            'writeinfojson': False,
+        }
+        
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            try:
+                info = ydl.extract_info(url, download=False)
+                
+                # Thumbnail URL'sini al
+                thumbnail_url = None
+                
+                # En iyi kaliteli thumbnail'ı bul
+                if 'thumbnails' in info and info['thumbnails']:
+                    # En yüksek kaliteli thumbnail'ı seç
+                    thumbnails = info['thumbnails']
+                    # Width ve height'a göre sırala
+                    thumbnails_sorted = sorted(thumbnails, 
+                                             key=lambda x: (x.get('width', 0) * x.get('height', 0)), 
+                                             reverse=True)
+                    
+                    if thumbnails_sorted:
+                        thumbnail_url = thumbnails_sorted[0]['url']
+                elif 'thumbnail' in info:
+                    thumbnail_url = info['thumbnail']
+                
+                if thumbnail_url:
+                    logger.info(f"✅ Thumbnail bulundu: {thumbnail_url}")
+                    return JSONResponse({
+                        "success": True,
+                        "thumbnail_url": thumbnail_url,
+                        "platform": platform,
+                        "title": info.get('title', 'Bilinmiyor'),
+                        "duration": info.get('duration', 0),
+                        "uploader": info.get('uploader', 'Bilinmiyor')
+                    })
+                else:
+                    logger.warning(f"❌ Thumbnail bulunamadı: {url}")
+                    return JSONResponse({
+                        "success": False,
+                        "error": "Thumbnail bulunamadı",
+                        "platform": platform
+                    }, status_code=404)
+                    
+            except Exception as e:
+                logger.error(f"❌ Video bilgisi alınamadı: {e}")
+                return JSONResponse({
+                    "success": False,
+                    "error": f"Video bilgisi alınamadı: {str(e)}",
+                    "platform": platform
+                }, status_code=400)
+                
+    except Exception as e:
+        logger.error(f"❌ Thumbnail endpoint hatası: {e}")
+        return JSONResponse({
+            "success": False,
+            "error": f"Genel hata: {str(e)}"
+        }, status_code=500)
+
 if __name__ == "__main__":
     import uvicorn
     import os

@@ -100,7 +100,7 @@ class VideoCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
+      decoration: BoxDecoration(
         color: platformColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: platformColor.withOpacity(0.3)),
@@ -141,16 +141,30 @@ class VideoCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Video thumbnail
+                  // Video thumbnail - Daha büyük ve gerçek kapak
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(12),
                     child: Container(
-                      width: 80,
-                      height: 60,
-                      color: Colors.grey[200],
-                      child: SmallVideoThumbnail(
-                    videoUrl: video.videoUrl,
-                    onTap: () => _openPreview(context),
+                      width: 120,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: VideoThumbnail(
+                        videoUrl: video.videoUrl,
+                        width: 120,
+                        height: 90,
+                        fit: BoxFit.cover,
+                        onTap: () => _openPreview(context),
+                        showPlayButton: true,
                       ),
                     ),
                   ),
@@ -223,8 +237,8 @@ class VideoCard extends StatelessWidget {
                           padding: EdgeInsets.all(8),
                           child: Icon(
                             Icons.download,
-                                color: Colors.white,
-                                size: 20,
+                            color: Colors.white,
+                            size: 20,
                           ),
                         ),
                       ),
@@ -238,7 +252,7 @@ class VideoCard extends StatelessWidget {
               // Açıklama (varsa)
               if (video.description.isNotEmpty) ...[
                 Text(
-                    video.description,
+                  video.description,
                   style: TextStyle(
                     color: Colors.grey[700],
                     fontSize: 13,
@@ -257,8 +271,8 @@ class VideoCard extends StatelessWidget {
                   children: video.tags
                       .take(3)
                       .map((tag) => TagChip(
-                      tag: tag,
-                      size: TagChipSize.small,
+                            tag: tag,
+                            size: TagChipSize.small,
                           ))
                       .toList(),
                 ),
@@ -304,9 +318,9 @@ class VideoCard extends StatelessWidget {
 
                   // Menü
                   PopupMenuButton<String>(
-                      onSelected: (value) {
-                        switch (value) {
-                          case 'edit':
+                    onSelected: (value) {
+                      switch (value) {
+                        case 'edit':
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -316,51 +330,51 @@ class VideoCard extends StatelessWidget {
                           ).then((result) {
                             if (result == true && onTap != null) onTap!();
                           });
-                            break;
-                          case 'share':
-                            ShareMenu.show(context, video);
-                            break;
-                          case 'delete':
-                            if (onDelete != null) onDelete!();
-                            break;
-                        }
-                      },
+                          break;
+                        case 'share':
+                          ShareMenu.show(context, video);
+                          break;
+                        case 'delete':
+                          if (onDelete != null) onDelete!();
+                          break;
+                      }
+                    },
                     icon: Icon(Icons.more_vert, color: Colors.grey[600]),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      itemBuilder: (context) => [
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    itemBuilder: (context) => [
                       const PopupMenuItem(
                         value: 'edit',
-                          child: Row(
-                            children: [
+                        child: Row(
+                          children: [
                             Icon(Icons.edit, size: 16),
-                              SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Text('Düzenle'),
                           ],
                         ),
                       ),
                       const PopupMenuItem(
-                          value: 'share',
-                          child: Row(
-                            children: [
+                        value: 'share',
+                        child: Row(
+                          children: [
                             Icon(Icons.share, size: 16),
-                              SizedBox(width: 8),
-                              Text('Paylaş'),
-                            ],
-                          ),
+                            SizedBox(width: 8),
+                            Text('Paylaş'),
+                          ],
                         ),
+                      ),
                       const PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
+                        value: 'delete',
+                        child: Row(
+                          children: [
                             Icon(Icons.delete, size: 16, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text('Sil', style: TextStyle(color: Colors.red)),
-                            ],
-                          ),
+                            SizedBox(width: 8),
+                            Text('Sil', style: TextStyle(color: Colors.red)),
+                          ],
                         ),
-                      ],
+                      ),
+                    ],
                   ),
                 ],
               ),

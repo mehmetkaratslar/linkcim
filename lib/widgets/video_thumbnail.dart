@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:linkcim/utils/url_utils.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class VideoThumbnail extends StatelessWidget {
   final String videoUrl;
@@ -26,10 +28,6 @@ class VideoThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final thumbnailUrl =
-        customThumbnailUrl ?? UrlUtils.getThumbnailUrl(videoUrl);
-    final postType = UrlUtils.getPostType(videoUrl);
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -44,14 +42,14 @@ class VideoThumbnail extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Thumbnail image
-              _buildThumbnailImage(thumbnailUrl),
+              // Thumbnail image - backend'den al
+              _buildSmartThumbnailImage(),
 
               // Play button overlay
               if (showPlayButton) _buildPlayButtonOverlay(),
 
               // Post type badge
-              _buildPostTypeBadge(postType),
+              _buildPostTypeBadge(UrlUtils.getPostType(videoUrl)),
 
               // Gradient overlay for better text visibility
               Container(
@@ -73,22 +71,156 @@ class VideoThumbnail extends StatelessWidget {
     );
   }
 
-  Widget _buildThumbnailImage(String thumbnailUrl) {
-    // Instagram thumbnail'ları artık çalışmıyor, platform bazlı placeholder göster
+  Widget _buildSmartThumbnailImage() {
     final platform = _getPlatformFromUrl(videoUrl);
 
-    if (thumbnailUrl.isNotEmpty && platform != 'instagram') {
+    // Önce custom thumbnail varsa onu kullan
+    if (customThumbnailUrl != null && customThumbnailUrl!.isNotEmpty) {
+      return _buildCachedImage(customThumbnailUrl!, platform);
+    }
+
+    // YouTube için direkt URL kullan
+    if (platform == 'youtube') {
+      final directUrl = UrlUtils.getThumbnailUrl(videoUrl);
+      if (directUrl.isNotEmpty) {
+        return _buildCachedImage(directUrl, platform);
+      }
+    }
+
+    // Diğer platformlar için backend'den al
+    return FutureBuilder<String?>(
+      future: _getBackendThumbnail(videoUrl),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildLoadingPlaceholder(platform);
+        }
+
+        if (snapshot.hasData && snapshot.data != null) {
+          return _buildCachedImage(snapshot.data!, platform);
+        }
+
+        // Hata durumunda platform placeholder
+        return _buildPlatformPlaceholder(platform);
+      },
+    );
+  }
+
+  Widget _buildCachedImage(String imageUrl, String platform) {
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      fit: fit,
+      placeholder: (context, url) => _buildLoadingPlaceholder(platform),
+      errorWidget: (context, url, error) {
+        print('❌ Thumbnail yüklenemedi: $imageUrl');
+        return _buildPlatformPlaceholder(platform);
+      },
+      fadeInDuration: Duration(milliseconds: 300),
+      fadeOutDuration: Duration(milliseconds: 300),
+      httpHeaders: {
+        'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      },
+    );
+  }
+
+  Future<String?> _getBackendThumbnail(String videoUrl) async {
+    try {
+      final encodedUrl = Uri.encodeComponent(videoUrl);
+      final response = await http.get(
+        Uri.parse(
+            'https://linkcim-production.up.railway.app/api/thumbnail?url=$encodedUrl'),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true && data['thumbnail_url'] != null) {
+          print('✅ Backend thumbnail alındı: ${data['thumbnail_url']}');
+          return data['thumbnail_url'];
+        }
+      }
+
+      print('❌ Backend thumbnail alınamadı: ${response.statusCode}');
+      return null;
+    } catch (e) {
+      print('❌ Backend thumbnail hatası: $e');
+      return null;
+    }
+  }
+
+  Widget _buildThumbnailImage(String thumbnailUrl) {
+    final platform = _getPlatformFromUrl(videoUrl);
+
+    if (thumbnailUrl.isNotEmpty) {
       return CachedNetworkImage(
         imageUrl: thumbnailUrl,
         fit: fit,
-        placeholder: (context, url) => _buildPlatformPlaceholder(platform),
-        errorWidget: (context, url, error) =>
-            _buildPlatformPlaceholder(platform),
+        placeholder: (context, url) => _buildLoadingPlaceholder(platform),
+        errorWidget: (context, url, error) {
+          print('❌ Thumbnail yüklenemedi: $thumbnailUrl');
+          return _buildPlatformPlaceholder(platform);
+        },
         fadeInDuration: Duration(milliseconds: 300),
         fadeOutDuration: Duration(milliseconds: 300),
+        httpHeaders: {
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        },
       );
     } else {
       return _buildPlatformPlaceholder(platform);
+    }
+  }
+
+  Widget _buildLoadingPlaceholder(String platform) {
+    final platformColor = _getPlatformColor(platform);
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            platformColor.withOpacity(0.1),
+            platformColor.withOpacity(0.05)
+          ],
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: platformColor,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Yükleniyor...',
+            style: TextStyle(
+              color: platformColor,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getPlatformColor(String platform) {
+    switch (platform) {
+      case 'instagram':
+        return Colors.purple;
+      case 'youtube':
+        return Colors.red;
+      case 'tiktok':
+        return Colors.black;
+      case 'twitter':
+        return Colors.blue;
+      default:
+        return Colors.grey;
     }
   }
 

@@ -27,22 +27,71 @@ class UrlUtils {
     }
   }
 
-  // Thumbnail URL'si oluştur (Instagram özel)
-  static String getThumbnailUrl(String instagramUrl) {
+  // Thumbnail URL'si oluştur (Tüm platformlar)
+  static String getThumbnailUrl(String videoUrl) {
     try {
-      Uri uri = Uri.parse(instagramUrl);
-      RegExp regExp = RegExp(r'/(p|reel|tv)/([A-Za-z0-9_-]+)');
-      Match? match = regExp.firstMatch(uri.path);
+      Uri uri = Uri.parse(videoUrl);
 
-      if (match != null) {
-        String postId = match.group(2)!;
-        // Instagram thumbnail için basit bir yaklaşım
-        return 'https://www.instagram.com/p/$postId/media/?size=m';
+      // YouTube thumbnail'ları - Direkt çalışır
+      if (uri.host.contains('youtube.com') || uri.host.contains('youtu.be')) {
+        String? videoId = _extractYouTubeVideoId(videoUrl);
+        if (videoId != null) {
+          return 'https://img.youtube.com/vi/$videoId/maxresdefault.jpg';
+        }
+      }
+
+      // Diğer platformlar için backend API'mizi kullan
+      if (uri.host.contains('tiktok.com') ||
+          uri.host.contains('twitter.com') ||
+          uri.host.contains('x.com') ||
+          uri.host.contains('instagram.com')) {
+        // Backend'den thumbnail al
+        return 'https://linkcim-production.up.railway.app/api/thumbnail?url=${Uri.encodeComponent(videoUrl)}';
       }
 
       return '';
     } catch (e) {
       return '';
+    }
+  }
+
+  // YouTube video ID'sini çıkar
+  static String? _extractYouTubeVideoId(String url) {
+    try {
+      Uri uri = Uri.parse(url);
+
+      // youtube.com/watch?v=VIDEO_ID
+      if (uri.host.contains('youtube.com') && uri.path == '/watch') {
+        return uri.queryParameters['v'];
+      }
+
+      // youtu.be/VIDEO_ID
+      if (uri.host.contains('youtu.be')) {
+        return uri.path.substring(1); // Remove leading '/'
+      }
+
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // TikTok video ID'sini çıkar
+  static String? _extractTikTokVideoId(String url) {
+    try {
+      Uri uri = Uri.parse(url);
+
+      // tiktok.com/@user/video/VIDEO_ID
+      RegExp regExp = RegExp(r'/video/(\d+)');
+      Match? match = regExp.firstMatch(uri.path);
+
+      if (match != null) {
+        return match.group(1);
+      }
+
+      return null;
+    } catch (e) {
+      return null;
     }
   }
 
