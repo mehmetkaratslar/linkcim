@@ -1,116 +1,80 @@
-# 🎬 Linkcim - Video Yönetim Uygulaması
+# 📱 Linkcim v2.0 - Süper Güçlü Video İndirme ve AI Analiz Uygulaması
 
-**Linkcim**, Instagram, YouTube, TikTok ve Twitter videolarınızı tek bir yerde toplayıp organize etmenizi sağlayan güçlü bir mobil uygulamadır. AI destekli otomatik kategorilendirme ile videolarınızı kolayca yönetebilirsiniz.
+<div align="center">
 
-## 📱 Hemen İndir
+![Linkcim Logo](assets/icons/icon.png)
 
-### 🤖 Android
-- **[APK İndir](https://github.com/mehmetkaratslar/linkcim/releases/latest)** - Direkt kurulum dosyası
-- **[Google Play Store](https://play.google.com/store/apps/details?id=com.linkcim.app)** *(Yakında)*
+**🚀 Instagram, YouTube, TikTok, Twitter videolarını indir, kategorize et ve AI ile organize et!**
 
-### 🍎 iOS
-- **[App Store](https://apps.apple.com/app/linkcim/id123456789)** *(Yakında)*
+[![Flutter](https://img.shields.io/badge/Flutter-3.0+-blue.svg)](https://flutter.dev/)
+[![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/)
+[![Version](https://img.shields.io/badge/Version-2.0.3-orange.svg)](https://github.com/mehmetkaratslar/linkcim/releases)
+[![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
 
-### 🌐 Web Versiyonu
-- **[Linkcim Web](https://linkcim.netlify.app)** - Tarayıcıdan kullanın
+</div>
 
----
+## ✨ Özellikler
 
-## ✨ Ne Yapabilirsiniz?
+### 🤖 **AI Destekli Analiz Sistemi**
+- **Akıllı Video Analizi**: OpenAI GPT ile otomatik başlık, kategori ve etiket önerileri
+- **Platform Metadata**: Instagram, YouTube, TikTok, Twitter için otomatik bilgi çekme
+- **Kullanıcı Başına 10 Ücretsiz Analiz**: Kendi API key'inizi ekleyerek sınırsız kullanım
 
-### 🎯 **Video Toplama & Organize Etme**
-- Instagram, YouTube, TikTok, Twitter linklerini kopyalayıp yapıştırın
-- AI otomatik olarak kategori, başlık ve açıklama oluşturur
-- Videolarınızı etiketleyip gruplayın
+### 📥 **Süper İndirme Sistemi**
+- **Çoklu Platform Desteği**: Instagram, YouTube, TikTok, Twitter
+- **Yüksek Kalite İndirme**: En iyi kalitede video indirme
+- **Otomatik Galeri Kaydı**: İndirilen videolar otomatik olarak galerinize kaydedilir
+- **İndirme Progress**: Gerçek zamanlı indirme durumu gösterimi
 
-### 💾 **Video İndirme**
-- Tüm platformlardan videoları direkt telefonunuza indirin
-- HD kalitede ve hızlı indirme
-- İndirilen videolar galeriye otomatik kaydedilir
+### 🎨 **Modern UI/UX Tasarımı**
+- **Material Design 3**: Modern ve şık arayüz
+- **Gradient Butonlar**: Renkli ve çekici buton tasarımları
+- **Kart Tabanlı Düzen**: Temiz ve organize görünüm
+- **Responsive Tasarım**: Tüm ekran boyutlarında mükemmel görünüm
 
-### 🔍 **Akıllı Arama**
-- Platform, kategori, yazar bazlı filtreleme
-- Ses içeriği analizi ile arama
-- Görsel analiz destekli kategorizasyon
+### 🔍 **Gelişmiş Arama ve Organizasyon**
+- **Akıllı Arama**: Başlık, yazar, platform, etiket araması
+- **Kategori Sistemi**: Videolarınızı kategorilere ayırın
+- **Etiket Sistemi**: Özel etiketlerle videolarınızı organize edin
+- **Video Önizleme**: Gerçek video thumbnail'ları
 
-### 📊 **İstatistikler**
-- İzleme geçmişi
-- Kategori analizi
-- Favori platformlar
-
----
-
-## 🚀 Nasıl Kullanılır?
-
-### 1️⃣ **Video Ekleme**
-```
-1. Uygulamayı açın
-2. "+" butonuna tıklayın
-3. Video linkini yapıştırın (Instagram, YouTube, TikTok, Twitter)
-4. AI analiz edip kategorize edecek
-5. İsterseniz etiket ekleyin
-```
-
-### 2️⃣ **Video İndirme**
-```
-1. Video kartındaki mavi indirme butonuna tıklayın
-2. "İndir" onayını verin
-3. Video telefonunuza indirilecek
-4. Galeriden veya "İndirilenler" sekmesinden erişin
-```
-
-### 3️⃣ **Arama & Filtreleme**
-```
-1. Arama sekmesine gidin
-2. Platform, kategori veya anahtar kelime girin
-3. Sonuçları filtreleyin
-4. İstediğiniz videoyu bulun
-```
-
----
+### 📱 **Kullanıcı Dostu Özellikler**
+- **Video Paylaşma**: Sosyal medyada kolayca paylaşın
+- **Video Çalma**: Uygulama içinde video oynatma
+- **İndirme Geçmişi**: Tüm indirilen videolarınızı görün
+- **Offline Çalışma**: İnternet olmadan videolarınıza erişin
 
 ## 📸 Ekran Görüntüleri
 
-| Ana Sayfa | Video Ekleme | İndirme | Arama |
-|-----------|--------------|---------|--------|
-| ![Ana Sayfa](assets/screenshots/home.png) | ![Ekleme](assets/screenshots/add.png) | ![İndirme](assets/screenshots/download.png) | ![Arama](assets/screenshots/search.png) |
+<div align="center">
 
----
+| Ana Sayfa | Video Ekleme | AI Analizi | İndirme Geçmişi |
+|-----------|--------------|------------|-----------------|
+| ![Ana Sayfa](screenshots/home.png) | ![Video Ekleme](screenshots/add.png) | ![AI Analizi](screenshots/ai.png) | ![Geçmiş](screenshots/history.png) |
 
-## 🌟 Özellikler
+</div>
 
-### 🎯 **Platform Desteği**
-- ✅ **Instagram** - Post, Reel, Story
-- ✅ **YouTube** - Video, Shorts  
-- ✅ **TikTok** - Video, Trend'ler
-- ✅ **Twitter** - Video tweet'ler
+## 🚀 Kurulum
 
-### 🤖 **AI Entegrasyonu**
-- **GPT-4o** ile otomatik kategorilendirme
-- **Whisper** ile ses içeriği analizi
-- **Vision API** ile görsel analiz
-- Akıllı etiket önerileri
+### 📱 **Android APK İndirme**
 
-### 📱 **Modern Arayüz**
-- Sade ve kullanıcı dostu tasarım
-- Koyu/Açık tema desteği
-- Hızlı ve akıcı animasyonlar
-- Tablet desteği
+1. **GitHub Releases**'den en son APK'yı indirin:
+   ```
+   https://github.com/mehmetkaratslar/linkcim/releases/latest
+   ```
 
-### 💾 **Güçlü Özellikler**
-- Çevrimdışı çalışma
-- Hızlı yerel veritabanı
-- Toplu işlemler
-- Yedekleme & Geri yükleme
+2. **APK'yı telefonunuza yükleyin**:
+   - APK dosyasını telefonunuza indirin
+   - Ayarlar > Güvenlik > Bilinmeyen Kaynaklardan yüklemeye izin verin
+   - APK dosyasına tıklayıp yükleyin
 
----
+### 🛠️ **Geliştirici Kurulumu**
 
-## 🛠️ Geliştiriciler İçin
-
-### 🔧 **Kurulum**
 ```bash
-# Projeyi klonlayın
+# Repository'yi klonlayın
 git clone https://github.com/mehmetkaratslar/linkcim.git
+
+# Proje dizinine gidin
 cd linkcim
 
 # Bağımlılıkları yükleyin
@@ -120,46 +84,98 @@ flutter pub get
 flutter run
 ```
 
-### ⚙️ **Gereksinimler**
-- Flutter 3.0+
-- Dart 3.0+
-- Android Studio veya VS Code
-- OpenAI API Key (opsiyonel)
+## 🎯 Kullanım
 
-### 📚 **Teknoloji Stack**
-- **Framework**: Flutter
-- **Veritabanı**: Hive (NoSQL)
-- **AI**: OpenAI GPT-4o, Whisper, Vision
-- **Backend**: Python FastAPI (Railway)
-- **Video**: yt-dlp, instagram-dl
+### 1. **Video Ekleme**
+- Ana sayfada "+" butonuna tıklayın
+- Video URL'sini yapıştırın (Instagram, YouTube, TikTok, Twitter)
+- 🤖 **AI Analiz** butonuna tıklayarak otomatik analiz yapın
+- Başlık, kategori ve etiketleri düzenleyin
+- **Kaydet ve İndir** butonuna tıklayın
 
----
+### 2. **AI Analizi Kullanma**
+- Video URL'sini girdikten sonra mor **🤖 AI Analiz** butonuna tıklayın
+- AI, video için otomatik başlık, kategori ve etiket önerir
+- Önerileri beğeniyorsanız yeşil **Uygula** butonuna tıklayın
+- İsterseniz manuel olarak düzenleyebilirsiniz
 
-## 🤝 Katkıda Bulunun
+### 3. **Video Arama**
+- Ana sayfada arama çubuğunu kullanın
+- Başlık, yazar, platform veya etiket ile arama yapın
+- Kategori filtrelerini kullanarak sonuçları daraltın
 
-### 🐛 **Hata Bildirimi**
-[Issue açarak](https://github.com/mehmetkaratslar/linkcim/issues) hata bildirebilirsiniz.
+### 4. **Video İzleme ve Paylaşma**
+- İndirme geçmişinde videolarınızı görün
+- **Oynat** butonuyla videoyu izleyin
+- **Paylaş** butonuyla sosyal medyada paylaşın
 
-### 💡 **Özellik İsteği**
-Yeni özellik fikirlerinizi [Discussions](https://github.com/mehmetkaratslar/linkcim/discussions) bölümünde paylaşın.
+## 🔑 API Konfigürasyonu
 
-### 👨‍💻 **Kod Katkısı**
-1. Fork edin
+### OpenAI API Key Ekleme
+1. Ayarlar sayfasına gidin
+2. "OpenAI API Key" bölümünden kendi key'inizi ekleyin
+3. [OpenAI Platform](https://platform.openai.com/api-keys)'dan ücretsiz API key alabilirsiniz
+4. Sınırsız AI analizi için kendi key'inizi kullanın
+
+## 🛡️ Güvenlik ve Gizlilik
+
+- **Yerel Depolama**: Tüm verileriniz cihazınızda güvenle saklanır
+- **Şifreleme**: Hassas veriler şifrelenmiş olarak saklanır
+- **Gizlilik**: Kişisel bilgileriniz hiçbir yere gönderilmez
+- **Açık Kaynak**: Kod tamamen açık ve incelenebilir
+
+## 🌟 Öne Çıkan Yenilikler v2.0
+
+### ✨ **Yeni Özellikler**
+- 🤖 **AI Analiz Sistemi** - OpenAI GPT entegrasyonu
+- 🎨 **Modern UI Tasarımı** - Tamamen yenilenen arayüz
+- 📥 **Gelişmiş İndirme** - Daha hızlı ve güvenilir indirme
+- 🖼️ **Gerçek Thumbnail'lar** - Video kapakları artık görünüyor
+
+### 🔧 **İyileştirmeler**
+- ⚡ **Performans Optimizasyonu** - %40 daha hızlı
+- 🎯 **Basitleştirilmiş Arayüz** - Daha kolay kullanım
+- 🔍 **Gelişmiş Arama** - Daha akıllı arama algoritması
+- 📱 **Responsive Tasarım** - Tüm ekranlarda mükemmel görünüm
+
+## 🤝 Katkıda Bulunma
+
+Katkılarınızı memnuniyetle karşılıyoruz! 
+
+1. Repository'yi fork edin
 2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Commit edin (`git commit -m 'Add amazing feature'`)
-4. Push edin (`git push origin feature/amazing-feature`)
-5. Pull Request açın
+3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
+4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
+5. Pull Request oluşturun
 
----
+## 📝 Changelog
+
+### v2.0.3 (Son Sürüm)
+- 🔧 Ana sayfa overflow sorunu düzeltildi
+- 📱 Responsive tasarım iyileştirmeleri
+- 🎨 Empty state tasarımı optimize edildi
+
+### v2.0.2
+- 🗂️ Arama sayfası basitleştirildi
+- ❌ Filtre butonu kaldırıldı
+- ⚡ Performans optimizasyonu
+
+### v2.0.1
+- 🚨 Search screen overflow hatası düzeltildi
+- ⏱️ Thumbnail timeout süreleri optimize edildi
+- 🎯 UI performans iyileştirmeleri
+
+### v2.0.0
+- 🤖 AI Analiz sistemi eklendi
+- 🎨 Modern UI tasarımı
+- 📥 Gelişmiş indirme sistemi
+- 🖼️ Gerçek video thumbnail'ları
 
 ## 📞 İletişim
 
-- **Developer**: [@mehmetkaratslar](https://github.com/mehmetkaratslar)
-- **Email**: mehmet@linkcim.app
-- **Website**: [linkcim.app](https://linkcim.app)
-- **Support**: [Telegram Grup](https://t.me/linkcim_support)
-
----
+- **Geliştirici**: Mehmet Karatslar
+- **GitHub**: [@mehmetkaratslar](https://github.com/mehmetkaratslar)
+- **Email**: [İletişim](mailto:your-email@example.com)
 
 ## 📄 Lisans
 
@@ -167,22 +183,10 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
 
 ---
 
-## ⭐ Destekleyin
-
-Bu projeyi beğendiyseniz:
-- ⭐ **Yıldız verin**
-- 🔄 **Paylaşın**
-- 🐛 **Hata bildirin**
-- 💡 **Özellik önerin**
-
----
-
 <div align="center">
 
-**🎬 Linkcim ile videolarınızı organize edin! 🚀**
+**⭐ Projeyi beğendiyseniz yıldız vermeyi unutmayın!**
 
-[İndir](https://github.com/mehmetkaratslar/linkcim/releases/latest) • [Dökümanlar](https://docs.linkcim.app) • [Destek](https://t.me/linkcim_support)
-
-Made with ❤️ in Turkey 🇹🇷
+**🚀 Linkcim ile videolarınızı AI ile organize edin!**
 
 </div>
