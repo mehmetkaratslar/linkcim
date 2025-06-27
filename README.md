@@ -67,7 +67,7 @@
 
 ### 📱 **Android APK İndirme**
 
-1. **GitHub Releases**'den en son APK'yı indirin en güncel versiyo 2 'dir:
+1. **GitHub Releases**'den en son APK'yı indirin en güncel versiyon 2 'dir:
    https://github.com/mehmetkaratslar/linkcim/releases/latest
    
 
