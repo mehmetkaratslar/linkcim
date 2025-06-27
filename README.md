@@ -68,9 +68,8 @@
 ### 📱 **Android APK İndirme**
 
 1. **GitHub Releases**'den en son APK'yı indirin:
-   ```
    https://github.com/mehmetkaratslar/linkcim/releases/latest
-   ```
+   
 
 2. **APK'yı telefonunuza yükleyin**:
    - APK dosyasını telefonunuza indirin
