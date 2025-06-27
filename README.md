@@ -50,7 +50,10 @@
 
 | Ana Sayfa | Video Ekleme | AI Analizi | İndirme Geçmişi |
 |-----------|--------------|------------|-----------------|
-| ![Ana Sayfa](screenshots/home.png) | ![Video Ekleme](screenshots/add.png) | ![AI Analizi](screenshots/ai.png) | ![Geçmiş](screenshots/history.png) |
+| ![Ana Sayfa](![anasayfa](https://github.com/user-attachments/assets/56a92ce1-ec76-43df-abff-f1bba201ed2f)
+) | ![Video Ekleme](![videoEkleme](https://github.com/user-attachments/assets/dd7cc2a6-4c2e-4e6d-8954-5aaec7e45bc7)
+) | | ![Geçmiş](![geçmiş](https://github.com/user-attachments/assets/d52a3f39-ba79-4e79-851b-4a1f096d5154)
+) |
 
 </div>
 
