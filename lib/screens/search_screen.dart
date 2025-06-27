@@ -186,49 +186,128 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text('Gelismis Arama'),
-        actions: [
-          IconButton(
-            icon: Icon(showFilters ? Icons.filter_list_off : Icons.filter_list),
-            onPressed: () {
-              setState(() => showFilters = !showFilters);
-            },
-            tooltip: 'Filtreleri ${showFilters ? 'Gizle' : 'Goster'}',
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.grey[800],
+        title: Text(
+          'Gelişmiş Arama',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
           ),
+        ),
+        centerTitle: true,
+        actions: [
+          // Filtre toggle butonu
+          Container(
+            margin: EdgeInsets.only(right: 8),
+            child: IconButton(
+              icon: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: showFilters ? Colors.blue[100] : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  showFilters ? Icons.filter_list : Icons.filter_list_outlined,
+                  color: showFilters ? Colors.blue[700] : Colors.grey[600],
+                  size: 20,
+                ),
+              ),
+              onPressed: () {
+                setState(() => showFilters = !showFilters);
+              },
+              tooltip: 'Filtreleri ${showFilters ? 'Gizle' : 'Göster'}',
+            ),
+          ),
+          // Temizle butonu
           if (selectedCategory != 'Tumu' ||
               selectedPlatform != 'Tumu' ||
               selectedAuthor != 'Tumu' ||
               selectedTags.isNotEmpty ||
               _searchController.text.isNotEmpty)
-            IconButton(
-              icon: Icon(Icons.clear_all),
-              onPressed: _clearFilters,
-              tooltip: 'Filtreleri Temizle',
+            Container(
+              margin: EdgeInsets.only(right: 16),
+              child: IconButton(
+                icon: Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.clear_all_rounded,
+                    color: Colors.red[700],
+                    size: 20,
+                  ),
+                ),
+                onPressed: _clearFilters,
+                tooltip: 'Filtreleri Temizle',
+              ),
             ),
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Container(
+            height: 1,
+            color: Colors.grey[200],
+          ),
+        ),
       ),
       body: Column(
         children: [
-          // Arama cubugu
-          Padding(
-            padding: EdgeInsets.all(16),
+          // Arama çubuğu - Modern tasarım
+          Container(
+            margin: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 10,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText:
-                    'Başlık, açıklama, yazar, platform, kategori veya etiket ara...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                hintText: 'Video ara... (başlık, yazar, platform, etiket)',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                border: InputBorder.none,
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                prefixIcon: Container(
+                  margin: EdgeInsets.all(12),
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.search_rounded,
+                      color: Colors.blue[600], size: 20),
                 ),
-                prefixIcon: Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          _performSearch();
-                        },
+                    ? Container(
+                        margin: EdgeInsets.all(12),
+                        child: IconButton(
+                          icon: Container(
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(Icons.clear_rounded,
+                                color: Colors.grey[600], size: 16),
+                          ),
+                          onPressed: () {
+                            _searchController.clear();
+                            _performSearch();
+                          },
+                        ),
                       )
                     : null,
               ),
@@ -236,19 +315,65 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
 
-          // Filtre bolumu
+          // Filtre bölümü - Modern kart tasarımı
           if (showFilters) ...[
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Filtre başlığı
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[50],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(Icons.tune_rounded,
+                            color: Colors.blue[600], size: 20),
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        'Filtreler',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
                   // Kategori filtreleri
                   if (allCategories.isNotEmpty) ...[
-                    Text(
-                      'Kategori:',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    Row(
+                      children: [
+                        Icon(Icons.category_outlined,
+                            size: 18, color: Colors.blue[600]),
+                        SizedBox(width: 8),
+                        Text(
+                          'Kategori',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 8),
                     Container(
@@ -281,10 +406,20 @@ class _SearchScreenState extends State<SearchScreen> {
 
                   // Platform filtreleri
                   if (allPlatforms.isNotEmpty) ...[
-                    Text(
-                      'Platform:',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    Row(
+                      children: [
+                        Icon(Icons.devices_outlined,
+                            size: 18, color: Colors.purple[600]),
+                        SizedBox(width: 8),
+                        Text(
+                          'Platform',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 8),
                     Container(
@@ -337,10 +472,20 @@ class _SearchScreenState extends State<SearchScreen> {
 
                   // Yazar filtreleri
                   if (allAuthors.isNotEmpty) ...[
-                    Text(
-                      'Yazar:',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    Row(
+                      children: [
+                        Icon(Icons.person_outline,
+                            size: 18, color: Colors.orange[600]),
+                        SizedBox(width: 8),
+                        Text(
+                          'Yazar',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 8),
                     Container(
@@ -375,10 +520,20 @@ class _SearchScreenState extends State<SearchScreen> {
 
                   // Etiket filtreleri
                   if (allTags.isNotEmpty) ...[
-                    Text(
-                      'Etiketler:',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    Row(
+                      children: [
+                        Icon(Icons.local_offer_outlined,
+                            size: 18, color: Colors.green[600]),
+                        SizedBox(width: 8),
+                        Text(
+                          'Etiketler',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 8),
                     Wrap(
@@ -400,33 +555,69 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             ),
-            Divider(),
           ],
 
-          // Sonuc sayisi
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
+          // Sonuç sayısı ve aktif filtreler
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[200]!),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '${searchResults.length} video bulundu',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[700],
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[50],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.video_library_outlined,
+                          color: Colors.blue[600], size: 16),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '${searchResults.length} video bulundu',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
-                Spacer(),
                 if (selectedTags.isNotEmpty) ...[
-                  Text('Secili etiketler: ', style: TextStyle(fontSize: 12)),
-                  ...selectedTags.map((tag) => Padding(
-                        padding: EdgeInsets.only(left: 4),
-                        child: TagChip(
-                          tag: tag,
-                          size: TagChipSize.small,
-                          onDeleted: () => _toggleTag(tag),
-                          showDelete: true,
+                  SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Text(
+                        'Seçili etiketler: ',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
                         ),
-                      )),
+                      ),
+                      Expanded(
+                        child: Wrap(
+                          spacing: 6,
+                          children: selectedTags
+                              .map((tag) => TagChip(
+                                    tag: tag,
+                                    size: TagChipSize.small,
+                                    onDeleted: () => _toggleTag(tag),
+                                    showDelete: true,
+                                  ))
+                              .toList(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ],
             ),
@@ -439,26 +630,30 @@ class _SearchScreenState extends State<SearchScreen> {
                 : searchResults.isEmpty
                     ? _buildEmptyState()
                     : ListView.builder(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         itemCount: searchResults.length,
                         itemBuilder: (context, index) {
                           final video = searchResults[index];
-                          return VideoCard(
-                            video: video,
-                            onDelete: () => _deleteVideo(video),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      AddVideoScreen(video: video),
-                                ),
-                              ).then((_) {
-                                _performSearch();
-                                _loadFilterOptions();
-                              });
-                            },
-                            highlightText: _searchController.text,
+                          return Container(
+                            margin: EdgeInsets.only(bottom: 12),
+                            child: VideoCard(
+                              video: video,
+                              onDelete: () => _deleteVideo(video),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        AddVideoScreen(video: video),
+                                  ),
+                                ).then((_) {
+                                  _performSearch();
+                                  _loadFilterOptions();
+                                });
+                              },
+                              highlightText: _searchController.text,
+                            ),
                           );
                         },
                       ),
@@ -470,36 +665,73 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildEmptyState() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.search_off,
-            size: 80,
-            color: Colors.grey[400],
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Arama kriterinize uygun video bulunamadi',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[600],
+      child: Container(
+        margin: EdgeInsets.all(40),
+        padding: EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: Offset(0, 2),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Farkli anahtar kelimeler veya filtreler deneyin',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.search_off_rounded,
+                size: 60,
+                color: Colors.grey[400],
+              ),
             ),
-          ),
-          SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _clearFilters,
-            child: Text('Filtreleri Temizle'),
-          ),
-        ],
+            SizedBox(height: 24),
+            Text(
+              'Video Bulunamadı',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
+              ),
+            ),
+            SizedBox(height: 12),
+            Text(
+              'Arama kriterinize uygun video bulunamadı.\nFarklı anahtar kelimeler veya filtreler deneyin.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                height: 1.5,
+              ),
+            ),
+            SizedBox(height: 24),
+            Container(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _clearFilters,
+                icon: Icon(Icons.refresh_rounded),
+                label: Text('Filtreleri Temizle'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[600],
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -322,54 +322,93 @@ class VideoDownloadService {
     }
   }
 
-  // 2️⃣ İndirme durumunu takip et
+  // 2️⃣ İndirme durumunu takip et - Daha akıcı ve detaylı
   static Future<Map<String, dynamic>> _pollDownloadStatus(
       String jobId, Function(double)? onProgress) async {
     try {
       _debugPrint('🔄 İndirme durumu takip ediliyor: $jobId');
 
       int attempts = 0;
-      const maxAttempts = 60; // 2 dakika maksimum bekleme
+      const maxAttempts = 90; // 3 dakika maksimum bekleme
+      double lastProgress = 0.0;
+      String lastStatus = '';
 
       while (attempts < maxAttempts) {
-        final response = await http.get(
-          Uri.parse('$_baseUrl/status/$jobId'),
-          headers: {
-            'Authorization': 'Bearer $_apiKey',
-          },
-        ).timeout(Duration(seconds: 10));
+        try {
+          final response = await http.get(
+            Uri.parse('$_baseUrl/status/$jobId'),
+            headers: {
+              'Authorization': 'Bearer $_apiKey',
+            },
+          ).timeout(Duration(seconds: 15));
 
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final status = data['status'];
-          final progress = (data['progress'] ?? 0.0).toDouble();
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            final status = data['status'] ?? 'processing';
+            final progress = (data['progress'] ?? 0.0).toDouble();
+            final stage = data['stage'] ?? 'Hazırlanıyor';
 
+            // Sadece değişiklik varsa log yaz
+            if (status != lastStatus ||
+                (progress - lastProgress).abs() > 0.05) {
+              _debugPrint(
+                  '📊 Durum: $status | Aşama: $stage | İlerleme: ${(progress * 100).toInt()}%');
+              lastStatus = status;
+              lastProgress = progress;
+            }
+
+            // Progress callback'i daha sık çağır
+            if (onProgress != null) {
+              // Smooth progress animation için
+              final smoothProgress = progress.clamp(0.0, 1.0);
+              onProgress(smoothProgress);
+            }
+
+            // Durum kontrolü
+            if (status == 'completed') {
+              // Son kez %100 göster
+              if (onProgress != null) {
+                onProgress(1.0);
+              }
+
+              return {
+                'success': true,
+                'job_data': data,
+                'message': '✅ İndirme tamamlandı',
+              };
+            } else if (status == 'failed' || status == 'error') {
+              throw Exception(data['error'] ?? 'İndirme başarısız');
+            } else if (status == 'processing' ||
+                status == 'downloading' ||
+                status == 'extracting') {
+              // Normal durum, devam et
+            }
+
+            // Dinamik bekleme süresi - ilerlemeye göre ayarla
+            int waitTime = _pollIntervalMs;
+            if (progress > 0.8) {
+              waitTime = 1000; // Son aşamada daha sık kontrol et
+            } else if (progress > 0.5) {
+              waitTime = 1500;
+            }
+
+            await Future.delayed(Duration(milliseconds: waitTime));
+            attempts++;
+          } else {
+            _debugPrint('⚠️ HTTP ${response.statusCode} - Tekrar deneniyor...');
+            await Future.delayed(Duration(milliseconds: _pollIntervalMs));
+            attempts++;
+          }
+        } catch (timeoutError) {
           _debugPrint(
-              '📊 Durum: $status, İlerleme: ${(progress * 100).toInt()}%');
-
-          if (onProgress != null) {
-            onProgress(progress);
-          }
-
-          if (status == 'completed') {
-            return {
-              'success': true,
-              'job_data': data,
-              'message': 'İndirme tamamlandı',
-            };
-          } else if (status == 'failed' || status == 'error') {
-            throw Exception(data['error'] ?? 'İndirme başarısız');
-          }
-
-          // Bekle ve tekrar kontrol et
+              '⏱️ Timeout - Tekrar deneniyor... (${attempts + 1}/$maxAttempts)');
           await Future.delayed(Duration(milliseconds: _pollIntervalMs));
           attempts++;
-        } else {
-          throw Exception('Durum kontrolü başarısız: ${response.statusCode}');
         }
       }
 
-      throw Exception('İndirme zaman aşımına uğradı');
+      throw Exception(
+          'İndirme zaman aşımına uğradı (${maxAttempts * _pollIntervalMs / 1000} saniye)');
     } catch (e) {
       _debugPrint('❌ Durum takip hatası: $e');
       return {

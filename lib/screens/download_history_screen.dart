@@ -576,91 +576,88 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
 
               SizedBox(height: 20),
 
-              // Alt kısım - Şık butonlar
+              // Alt kısım - Şık butonlar (Galeriye kaydet butonu kaldırıldı)
               Row(
                 children: [
                   // Oynatma butonu - ana buton
                   Expanded(
-                    flex: 2,
+                    flex: 3,
                     child: Container(
-                      height: 45,
+                      height: 50,
                       child: ElevatedButton.icon(
                         onPressed: () => _playVideo(filePath, fileName),
-                        icon: Icon(Icons.play_arrow_rounded, size: 20),
+                        icon: Icon(Icons.play_arrow_rounded, size: 22),
                         label: Text(
                           'Oynat',
                           style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue[600],
                           foregroundColor: Colors.white,
-                          elevation: 3,
-                          shadowColor: Colors.blue.withOpacity(0.3),
+                          elevation: 4,
+                          shadowColor: Colors.blue.withOpacity(0.4),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(18),
                           ),
                         ),
                       ),
                     ),
                   ),
 
-                  SizedBox(width: 10),
+                  SizedBox(width: 12),
 
-                  // Galeriye kaydet butonu
+                  // Paylaşma butonu - daha büyük
                   Expanded(
+                    flex: 2,
                     child: Container(
-                      height: 45,
-                      child: ElevatedButton(
-                        onPressed: () => _saveToGallery(filePath, fileName),
-                        child: Icon(Icons.save_alt_rounded, size: 20),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[600],
-                          foregroundColor: Colors.white,
-                          elevation: 3,
-                          shadowColor: Colors.green.withOpacity(0.3),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(width: 10),
-
-                  // Paylaşma butonu
-                  Expanded(
-                    child: Container(
-                      height: 45,
-                      child: ElevatedButton(
+                      height: 50,
+                      child: ElevatedButton.icon(
                         onPressed: () => _shareFile(filePath),
-                        child: Icon(Icons.share_rounded, size: 20),
+                        icon: Icon(Icons.share_rounded, size: 2),
+                        label: Text(
+                          'Paylaş',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange[600],
                           foregroundColor: Colors.white,
-                          elevation: 3,
-                          shadowColor: Colors.orange.withOpacity(0.3),
+                          elevation: 4,
+                          shadowColor: Colors.orange.withOpacity(0.4),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(18),
                           ),
                         ),
                       ),
                     ),
                   ),
 
-                  SizedBox(width: 10),
+                  SizedBox(width: 12),
 
-                  // Menü butonu - daha şık
+                  // Menü butonu - daha şık ve büyük
                   Container(
-                    width: 45,
-                    height: 45,
+                    width: 50,
+                    height: 50,
                     decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(15),
+                      gradient: LinearGradient(
+                        colors: [Colors.grey[100]!, Colors.grey[50]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(18),
                       border: Border.all(color: Colors.grey[300]!),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: PopupMenuButton<String>(
                       onSelected: (value) {
@@ -674,7 +671,7 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
                         }
                       },
                       icon: Icon(Icons.more_vert_rounded,
-                          color: Colors.grey[700]),
+                          color: Colors.grey[700], size: 22),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -788,64 +785,6 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
       );
     } catch (e) {
       _showError('Video oynatma hatası: $e');
-    }
-  }
-
-  Future<void> _saveToGallery(String filePath, String fileName) async {
-    try {
-      final file = File(filePath);
-      if (!await file.exists()) {
-        _showError('Video dosyası bulunamadı');
-        return;
-      }
-
-      // Show loading
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Text('Galeriye kaydediliyor...'),
-              ],
-            ),
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
-
-      // Save to gallery
-      await Gal.putVideo(filePath);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 12),
-                Text('Video galeriye kaydedildi!'),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        _showError('Galeriye kaydetme hatası: $e');
-      }
     }
   }
 

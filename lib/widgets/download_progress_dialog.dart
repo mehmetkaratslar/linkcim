@@ -23,10 +23,13 @@ class DownloadProgressDialog extends StatefulWidget {
 class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
   double progress = 0.0;
   String status = 'İndirme başlatılıyor...';
+  String stage = 'Hazırlanıyor';
   bool isCompleted = false;
   bool hasError = false;
   String? errorMessage;
   String? downloadedFilePath;
+  String? speed;
+  String? eta;
 
   @override
   void initState() {
@@ -50,7 +53,24 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
         onProgress: (downloadProgress) {
           setState(() {
             progress = downloadProgress;
-            status = 'İndiriliyor... ${(downloadProgress * 100).toInt()}%';
+
+            // Progress durumuna göre stage ve status güncelle
+            if (downloadProgress < 0.1) {
+              stage = 'Başlatılıyor';
+              status = 'Video bilgileri alınıyor...';
+            } else if (downloadProgress < 0.3) {
+              stage = 'Hazırlanıyor';
+              status = 'İndirme hazırlanıyor...';
+            } else if (downloadProgress < 0.9) {
+              stage = 'İndiriliyor';
+              status = 'İndiriliyor... ${(downloadProgress * 100).toInt()}%';
+            } else if (downloadProgress < 1.0) {
+              stage = 'Tamamlanıyor';
+              status = 'Son işlemler yapılıyor...';
+            } else {
+              stage = 'Tamamlandı';
+              status = 'İndirme tamamlandı!';
+            }
           });
         },
       );
@@ -232,26 +252,81 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
 
             const SizedBox(height: 16),
 
-            // Progress bar (sadece indirme sırasında)
+            // Progress bar ve detaylar (sadece indirme sırasında)
             if (!hasError && !isCompleted) ...[
-              LinearProgressIndicator(
-                value: progress,
-                backgroundColor: Colors.grey[300],
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+              // Stage gösterimi
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.blue[200]!),
+                    ),
+                    child: Text(
+                      stage,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.blue[700],
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  Text(
+                    '${(progress * 100).toInt()}%',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue[700],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Animasyonlu progress bar
+              Container(
+                height: 8,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  color: Colors.grey[200],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    width: MediaQuery.of(context).size.width * 0.7 * progress,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.blue[400]!, Colors.blue[600]!],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(height: 8),
             ],
 
-            // Status mesajı
-            Text(
-              status,
-              style: TextStyle(
-                fontSize: 14,
-                color: hasError
-                    ? Colors.red[700]
-                    : isCompleted
-                        ? Colors.green[700]
-                        : Colors.grey[700],
+            // Status mesajı - daha büyük ve belirgin
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                status,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: hasError
+                      ? Colors.red[700]
+                      : isCompleted
+                          ? Colors.green[700]
+                          : Colors.grey[800],
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
 
