@@ -96,8 +96,8 @@ class VideoDownloadService {
     _debugPrint('🚀 Python API ile video indirme başlatılıyor: $videoUrl');
 
     try {
-      // İzin kontrolü
-      await requestPermissions();
+    // İzin kontrolü
+    await requestPermissions();
 
       // 1️⃣ Python API'ye indirme isteği gönder
       final startResult = await _startDownload(videoUrl, platform, quality);
@@ -146,16 +146,16 @@ class VideoDownloadService {
 
   // 🌟 PLATFORM DESTEĞİ KONTROL ET
   static Future<Map<String, dynamic>> getSupportedPlatforms() async {
-    try {
-      final response = await http.get(
+        try {
+          final response = await http.get(
         Uri.parse('$_baseUrl/platforms'),
-        headers: {
+            headers: {
           'Authorization': 'Bearer $_apiKey',
           'Content-Type': 'application/json',
         },
       ).timeout(Duration(seconds: 10));
 
-      if (response.statusCode == 200) {
+          if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return {
           'success': true,
@@ -163,8 +163,8 @@ class VideoDownloadService {
         };
       } else {
         throw Exception('HTTP ${response.statusCode}');
-      }
-    } catch (e) {
+          }
+        } catch (e) {
       _debugPrint('❌ Platform listesi alınamadı: $e');
       return {
         'success': false,
@@ -199,16 +199,16 @@ class VideoDownloadService {
 
   // 🔥 HEALTH CHECK - API ÇALIŞIYOR MU?
   static Future<bool> checkApiHealth() async {
-    try {
-      final response = await http.get(
+        try {
+          final response = await http.get(
         Uri.parse('$_baseUrl/health'),
-        headers: {
+            headers: {
           'Authorization': 'Bearer $_apiKey',
         },
       ).timeout(Duration(seconds: 5));
 
       return response.statusCode == 200;
-    } catch (e) {
+        } catch (e) {
       _debugPrint('❌ API sağlık kontrolü başarısız: $e');
       return false;
     }
@@ -219,13 +219,13 @@ class VideoDownloadService {
     try {
       final response = await http.delete(
         Uri.parse('$_baseUrl/job/$jobId'),
-        headers: {
+            headers: {
           'Authorization': 'Bearer $_apiKey',
         },
       ).timeout(Duration(seconds: 10));
 
       return response.statusCode == 200;
-    } catch (e) {
+        } catch (e) {
       _debugPrint('❌ İş silinirken hata: $e');
       return false;
     }
@@ -255,7 +255,7 @@ class VideoDownloadService {
           )
           .timeout(Duration(seconds: _timeoutSeconds));
 
-      if (response.statusCode == 200) {
+          if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return {
           'success': true,
@@ -266,8 +266,8 @@ class VideoDownloadService {
       } else {
         final errorData = jsonDecode(response.body);
         throw Exception(errorData['detail'] ?? 'İndirme başlatılamadı');
-      }
-    } catch (e) {
+          }
+        } catch (e) {
       return {
         'success': false,
         'error': 'İndirme başlatma hatası: $e',
@@ -283,14 +283,14 @@ class VideoDownloadService {
       const maxAttempts = 60; // 2 dakika bekle (60 * 2 saniye)
 
       while (attempts < maxAttempts) {
-        final response = await http.get(
+      final response = await http.get(
           Uri.parse('$_baseUrl/status/$jobId'),
-          headers: {
+        headers: {
             'Authorization': 'Bearer $_apiKey',
-          },
+        },
         ).timeout(Duration(seconds: 10));
 
-        if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
           final jobData = jsonDecode(response.body);
           final status = jobData['status'];
           final progress = (jobData['progress'] ?? 0).toDouble();
@@ -355,12 +355,12 @@ class VideoDownloadService {
         final fileSize = await file.length();
         _debugPrint('✅ Dosya kaydedildi: $filePath (${fileSize} bytes)');
 
-        return {
-          'success': true,
+          return {
+            'success': true,
           'file_path': filePath,
-          'file_size': fileSize,
-        };
-      } else {
+            'file_size': fileSize,
+          };
+        } else {
         throw Exception('Dosya indirme başarısız: HTTP ${response.statusCode}');
       }
     } catch (e) {
@@ -472,7 +472,7 @@ class VideoDownloadService {
         return true;
       } else {
         _debugPrint('⚠️ Dosya bulunamadı: $filePath');
-        return false;
+      return false;
       }
     } catch (e) {
       _debugPrint('❌ Dosya silinirken hata: $e');
@@ -545,12 +545,12 @@ class VideoDownloadService {
     final platform = detectPlatform(videoUrl);
 
     return await downloadVideo(
-      videoUrl: videoUrl,
-      platform: platform,
-      customFileName: customFileName,
+        videoUrl: videoUrl,
+        platform: platform,
+        customFileName: customFileName,
       quality: 'low', // Hızlı indirme için düşük kalite
-      onProgress: onProgress,
-    );
+        onProgress: onProgress,
+      );
   }
 
   // 📱 MOBİL UYUMLU VİDEO İNDİRME (Orta kalite)
@@ -668,8 +668,8 @@ class VideoDownloadService {
         }
       }
 
-      return {
-        'success': true,
+          return {
+            'success': true,
         'deleted_count': deletedCount,
         'freed_space': totalSize,
         'message':
