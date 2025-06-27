@@ -10,7 +10,8 @@ import 'package:device_info_plus/device_info_plus.dart';
 class VideoDownloadService {
   // 🎯 PYTHON API İLE ENTEGRE VİDEO İNDİRME SİSTEMİ
 
-  static const String _baseUrl = 'http://localhost:8000'; // Local Python API
+  static const String _baseUrl =
+      'https://linkcim-production.up.railway.app'; // Railway Cloud API
   static const String _apiKey =
       '45541d717524a99df5f994bb9f6cbce825269852be079594b8e35f7752d6f1bd';
   static const int _timeoutSeconds = 120;
