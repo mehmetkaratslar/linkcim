@@ -87,22 +87,9 @@ class VideoThumbnail extends StatelessWidget {
       }
     }
 
-    // Diğer platformlar için backend'den al
-    return FutureBuilder<String?>(
-      future: _getBackendThumbnail(videoUrl),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return _buildLoadingPlaceholder(platform);
-        }
-
-        if (snapshot.hasData && snapshot.data != null) {
-          return _buildCachedImage(snapshot.data!, platform);
-        }
-
-        // Hata durumunda platform placeholder
-        return _buildPlatformPlaceholder(platform);
-      },
-    );
+    // Diğer platformlar için hızlı fallback - direkt placeholder göster
+    // Backend thumbnail'ı arka planda deneyebiliriz ama UI'da beklemeyelim
+    return _buildPlatformPlaceholder(platform);
   }
 
   Widget _buildCachedImage(String imageUrl, String platform) {
@@ -130,7 +117,7 @@ class VideoThumbnail extends StatelessWidget {
         Uri.parse(
             'https://linkcim-production.up.railway.app/api/thumbnail?url=$encodedUrl'),
         headers: {'Content-Type': 'application/json'},
-      ).timeout(Duration(seconds: 10));
+      ).timeout(Duration(seconds: 5)); // 5 saniye timeout
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -143,7 +130,8 @@ class VideoThumbnail extends StatelessWidget {
       print('❌ Backend thumbnail alınamadı: ${response.statusCode}');
       return null;
     } catch (e) {
-      print('❌ Backend thumbnail hatası: $e');
+      // Timeout veya network hataları için sessiz hata
+      // print('❌ Backend thumbnail hatası: $e');
       return null;
     }
   }

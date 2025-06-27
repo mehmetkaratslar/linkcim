@@ -3,7 +3,7 @@
 name: linkcim
 description: Süper Güçlü Video İndirme ve Akıllı AI Analiz Uygulaması - Her türlü videoyu indir, kategorize et ve organize et!
 publish_to: 'none'
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

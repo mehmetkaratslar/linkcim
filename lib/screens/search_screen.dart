@@ -317,242 +317,244 @@ class _SearchScreenState extends State<SearchScreen> {
 
           // Filtre bölümü - Modern kart tasarımı
           if (showFilters) ...[
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Filtre başlığı
-                  Row(
-                    children: [
+            Flexible(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Filtre başlığı
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue[50],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.tune_rounded,
+                              color: Colors.blue[600], size: 20),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Filtreler',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    // Kategori filtreleri
+                    if (allCategories.isNotEmpty) ...[
+                      Row(
+                        children: [
+                          Icon(Icons.category_outlined,
+                              size: 18, color: Colors.blue[600]),
+                          SizedBox(width: 8),
+                          Text(
+                            'Kategori',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
                       Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[50],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(Icons.tune_rounded,
-                            color: Colors.blue[600], size: 20),
-                      ),
-                      SizedBox(width: 12),
-                      Text(
-                        'Filtreler',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  // Kategori filtreleri
-                  if (allCategories.isNotEmpty) ...[
-                    Row(
-                      children: [
-                        Icon(Icons.category_outlined,
-                            size: 18, color: Colors.blue[600]),
-                        SizedBox(width: 8),
-                        Text(
-                          'Kategori',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      height: 40,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: allCategories.length,
-                        itemBuilder: (context, index) {
-                          final category = allCategories[index];
-                          final isSelected = category == selectedCategory;
+                        height: 40,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: allCategories.length,
+                          itemBuilder: (context, index) {
+                            final category = allCategories[index];
+                            final isSelected = category == selectedCategory;
 
-                          return Padding(
-                            padding: EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              label: Text(category),
-                              selected: isSelected,
-                              onSelected: (_) {
-                                setState(() => selectedCategory = category);
-                                _performSearch();
-                              },
-                              selectedColor: Colors.blue[100],
-                              checkmarkColor: Colors.blue[800],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                  ],
-
-                  // Platform filtreleri
-                  if (allPlatforms.isNotEmpty) ...[
-                    Row(
-                      children: [
-                        Icon(Icons.devices_outlined,
-                            size: 18, color: Colors.purple[600]),
-                        SizedBox(width: 8),
-                        Text(
-                          'Platform',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      height: 40,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: allPlatforms.length,
-                        itemBuilder: (context, index) {
-                          final platform = allPlatforms[index];
-                          final isSelected = platform == selectedPlatform;
-
-                          // Platform ikonunu al
-                          String icon = '🔗';
-                          if (platform.toLowerCase() == 'instagram')
-                            icon = '📷';
-                          else if (platform.toLowerCase() == 'youtube')
-                            icon = '📺';
-                          else if (platform.toLowerCase() == 'tiktok')
-                            icon = '🎵';
-                          else if (platform.toLowerCase() == 'twitter')
-                            icon = '🐦';
-
-                          return Padding(
-                            padding: EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              label: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(icon),
-                                  SizedBox(width: 4),
-                                  Text(platform == 'Tümü'
-                                      ? platform
-                                      : platform.toUpperCase()),
-                                ],
+                            return Padding(
+                              padding: EdgeInsets.only(right: 8),
+                              child: FilterChip(
+                                label: Text(category),
+                                selected: isSelected,
+                                onSelected: (_) {
+                                  setState(() => selectedCategory = category);
+                                  _performSearch();
+                                },
+                                selectedColor: Colors.blue[100],
+                                checkmarkColor: Colors.blue[800],
                               ),
-                              selected: isSelected,
-                              onSelected: (_) {
-                                setState(() => selectedPlatform = platform);
-                                _performSearch();
-                              },
-                              selectedColor: Colors.purple[100],
-                              checkmarkColor: Colors.purple[800],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                  ],
-
-                  // Yazar filtreleri
-                  if (allAuthors.isNotEmpty) ...[
-                    Row(
-                      children: [
-                        Icon(Icons.person_outline,
-                            size: 18, color: Colors.orange[600]),
-                        SizedBox(width: 8),
-                        Text(
-                          'Yazar',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                          ),
+                            );
+                          },
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      height: 40,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: allAuthors.length,
-                        itemBuilder: (context, index) {
-                          final author = allAuthors[index];
-                          final isSelected = author == selectedAuthor;
-
-                          return Padding(
-                            padding: EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              label: Text(author.length > 15
-                                  ? '${author.substring(0, 15)}...'
-                                  : author),
-                              selected: isSelected,
-                              onSelected: (_) {
-                                setState(() => selectedAuthor = author);
-                                _performSearch();
-                              },
-                              selectedColor: Colors.orange[100],
-                              checkmarkColor: Colors.orange[800],
-                            ),
-                          );
-                        },
                       ),
-                    ),
-                    SizedBox(height: 16),
-                  ],
+                      SizedBox(height: 16),
+                    ],
 
-                  // Etiket filtreleri
-                  if (allTags.isNotEmpty) ...[
-                    Row(
-                      children: [
-                        Icon(Icons.local_offer_outlined,
-                            size: 18, color: Colors.green[600]),
-                        SizedBox(width: 8),
-                        Text(
-                          'Etiketler',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: Colors.grey[700],
+                    // Platform filtreleri
+                    if (allPlatforms.isNotEmpty) ...[
+                      Row(
+                        children: [
+                          Icon(Icons.devices_outlined,
+                              size: 18, color: Colors.purple[600]),
+                          SizedBox(width: 8),
+                          Text(
+                            'Platform',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Colors.grey[700],
+                            ),
                           ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Container(
+                        height: 40,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: allPlatforms.length,
+                          itemBuilder: (context, index) {
+                            final platform = allPlatforms[index];
+                            final isSelected = platform == selectedPlatform;
+
+                            // Platform ikonunu al
+                            String icon = '🔗';
+                            if (platform.toLowerCase() == 'instagram')
+                              icon = '📷';
+                            else if (platform.toLowerCase() == 'youtube')
+                              icon = '📺';
+                            else if (platform.toLowerCase() == 'tiktok')
+                              icon = '🎵';
+                            else if (platform.toLowerCase() == 'twitter')
+                              icon = '🐦';
+
+                            return Padding(
+                              padding: EdgeInsets.only(right: 8),
+                              child: FilterChip(
+                                label: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(icon),
+                                    SizedBox(width: 4),
+                                    Text(platform == 'Tümü'
+                                        ? platform
+                                        : platform.toUpperCase()),
+                                  ],
+                                ),
+                                selected: isSelected,
+                                onSelected: (_) {
+                                  setState(() => selectedPlatform = platform);
+                                  _performSearch();
+                                },
+                                selectedColor: Colors.purple[100],
+                                checkmarkColor: Colors.purple[800],
+                              ),
+                            );
+                          },
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: allTags.map((tag) {
-                        final isSelected = selectedTags.contains(tag);
-                        return FilterChip(
-                          label: Text(tag),
-                          selected: isSelected,
-                          onSelected: (_) => _toggleTag(tag),
-                          selectedColor: Colors.green[100],
-                          checkmarkColor: Colors.green[800],
-                        );
-                      }).toList(),
-                    ),
-                    SizedBox(height: 16),
+                      ),
+                      SizedBox(height: 16),
+                    ],
+
+                    // Yazar filtreleri
+                    if (allAuthors.isNotEmpty) ...[
+                      Row(
+                        children: [
+                          Icon(Icons.person_outline,
+                              size: 18, color: Colors.orange[600]),
+                          SizedBox(width: 8),
+                          Text(
+                            'Yazar',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Container(
+                        height: 40,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: allAuthors.length,
+                          itemBuilder: (context, index) {
+                            final author = allAuthors[index];
+                            final isSelected = author == selectedAuthor;
+
+                            return Padding(
+                              padding: EdgeInsets.only(right: 8),
+                              child: FilterChip(
+                                label: Text(author.length > 15
+                                    ? '${author.substring(0, 15)}...'
+                                    : author),
+                                selected: isSelected,
+                                onSelected: (_) {
+                                  setState(() => selectedAuthor = author);
+                                  _performSearch();
+                                },
+                                selectedColor: Colors.orange[100],
+                                checkmarkColor: Colors.orange[800],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                    ],
+
+                    // Etiket filtreleri
+                    if (allTags.isNotEmpty) ...[
+                      Row(
+                        children: [
+                          Icon(Icons.local_offer_outlined,
+                              size: 18, color: Colors.green[600]),
+                          SizedBox(width: 8),
+                          Text(
+                            'Etiketler',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: allTags.map((tag) {
+                          final isSelected = selectedTags.contains(tag);
+                          return FilterChip(
+                            label: Text(tag),
+                            selected: isSelected,
+                            onSelected: (_) => _toggleTag(tag),
+                            selectedColor: Colors.green[100],
+                            checkmarkColor: Colors.green[800],
+                          );
+                        }).toList(),
+                      ),
+                      SizedBox(height: 16),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ],
